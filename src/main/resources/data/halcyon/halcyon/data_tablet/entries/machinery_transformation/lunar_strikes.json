@@ -19,7 +19,8 @@
       "type": "halcyon:crafting",
       "recipes": [
         "halcyon:crafting/shard_of_transformation_compacting",
-        "halcyon:crafting/shard_of_transformation_decompacting"
+        "halcyon:crafting/shard_of_transformation_decompacting",
+        "halcyon:entropic_processing/tidal_meteorite"
       ]
     }
   ],

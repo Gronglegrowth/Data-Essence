@@ -16,7 +16,8 @@
     {
       "type": "halcyon:crafting",
       "recipes": [
-        "halcyon:fabrication/machines/crystalline_cradle"
+        "halcyon:fabrication/machines/crystalline_cradle",
+        "halcyon:fabrication/vanilla/bell"
       ]
     }
   ],

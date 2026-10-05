@@ -35,6 +35,8 @@ import java.util.List;
 public class OreScanner extends Item {
     public static ResourceLocation FUEL_ESSENCE_TYPE = Halcyon.locate("essence");
     public static int ESSENCE_COST = 50;
+    public static int COOLDOWN = 20 * 10;
+
     public OreScanner(Properties pProperties) {
         super(pProperties.component(DataComponentRegistry.ESSENCE_STORAGE, new ItemEssenceContainer(List.of(FUEL_ESSENCE_TYPE), 2500)));
     }
@@ -59,7 +61,7 @@ public class OreScanner extends Item {
                     }
                 }
                 ModMessages.sendToPlayer(new AddScannedOre(ores), (ServerPlayer)pPlayer);
-                pPlayer.getCooldowns().addCooldown(this, 20 * 10);
+                pPlayer.getCooldowns().addCooldown(this, COOLDOWN);
                 ItemEssenceContainer.removeEssence(stack, FUEL_ESSENCE_TYPE, ESSENCE_COST);
             }
         }

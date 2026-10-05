@@ -41,16 +41,20 @@ import java.util.*;
 
 @EventBusSubscriber(value = Dist.CLIENT, modid = Halcyon.MOD_ID)
 public class OrePingShader extends PostShaderInstance {
+    private static RenderTarget orePingTarget;
+    static MultiBufferSource.BufferSource orePingBufferSource = null;
+
     @Override
     public ResourceLocation getShaderLocation() {
         return Halcyon.locate("shaders/post/hologram.json");
     }
+
     @Override
     public void setUniforms(PostPass instance) {
         super.setUniforms(instance);
         instance.getEffect().setSampler("HologramSampler", getOrePingTarget()::getColorTextureId);
     }
-    private static RenderTarget orePingTarget;
+
     public static RenderTarget getOrePingTarget() {
         if (orePingTarget == null) {
             orePingTarget = new MainTarget(Minecraft.getInstance().getMainRenderTarget().width, Minecraft.getInstance().getMainRenderTarget().height);
@@ -58,7 +62,7 @@ public class OrePingShader extends PostShaderInstance {
         }
         return orePingTarget;
     }
-    static MultiBufferSource.BufferSource orePingBufferSource = null;
+
     public static MultiBufferSource.BufferSource createOrePingBufferSource() {
         if (orePingBufferSource == null) {
             RenderBuffers renderBuffers = Minecraft.getInstance().renderBuffers();
@@ -84,6 +88,7 @@ public class OrePingShader extends PostShaderInstance {
             RenderSystem.applyModelViewMatrix();
         }
     }
+
     @SubscribeEvent
     public static void onRenderLevelStage(RenderLevelStageEvent event) {
         if (event.getStage().equals(RenderLevelStageEvent.Stage.AFTER_WEATHER)) {
@@ -117,6 +122,7 @@ public class OrePingShader extends PostShaderInstance {
     private static void doEffectRendering() {
 
     }
+
     protected static void renderBlock(BlockState block, BlockPos pos, PoseStack stack, DeltaTracker partialTick, MultiBufferSource.BufferSource bufferSource) {
         if (Minecraft.getInstance().level == null) {
             return;
@@ -130,6 +136,7 @@ public class OrePingShader extends PostShaderInstance {
         }
         stack.popPose();
     }
+
     private static final BlockAndTintGetter BLOCK_AND_TINT_GETTER = new BlockAndTintGetter() {
 
         @Nullable
@@ -210,6 +217,7 @@ public class OrePingShader extends PostShaderInstance {
             return Minecraft.getInstance().level.getMinBuildHeight();
         }
     };
+
     private static class OrePingBuffers extends MultiBufferSource.BufferSource {
         protected OrePingBuffers(ByteBufferBuilder fallback, SequencedMap<RenderType, ByteBufferBuilder> layerBuffers) {
             super(fallback, layerBuffers);

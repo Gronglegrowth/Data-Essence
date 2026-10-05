@@ -1,0 +1,6 @@
+{
+  "type": "halcyon:entropic_processing",
+  "input": { "item": "halcyon:tidal_meteorite" },
+  "time": 260,
+  "result": { "id": "halcyon:shard_of_transformation", "count": 12 }
+}

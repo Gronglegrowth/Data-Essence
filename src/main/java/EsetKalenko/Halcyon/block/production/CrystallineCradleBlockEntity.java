@@ -33,7 +33,7 @@ public class CrystallineCradleBlockEntity extends BlockEntity implements Essence
     private final int[] notes = {6, 8, 10, 13, 18, 0,
                                  18, 13, 17, 18, 20, 0};
     private final int[] chords = {6, 0, 0, 0, 0, 0,
-                                  18, 0, 0, 0, 0, 0};
+                                  6, 0, 0, 0, 0, 0};
     private int currentNote;
 
     public CrystallineCradleBlockEntity(BlockPos pPos, BlockState pBlockState) {

@@ -22,16 +22,20 @@ import java.util.SequencedMap;
 
 @EventBusSubscriber(value = Dist.CLIENT, modid = Halcyon.MOD_ID)
 public class MachineOutputShader extends PostShaderInstance {
+    private static RenderTarget machineOutputTarget;
+    static MultiBufferSource.BufferSource machineOutputBufferSource = null;
+
     @Override
     public ResourceLocation getShaderLocation() {
         return Halcyon.locate("shaders/post/hologram.json");
     }
+
     @Override
     public void setUniforms(PostPass instance) {
         super.setUniforms(instance);
         instance.getEffect().setSampler("HologramSampler", getMachineOutputTarget()::getColorTextureId);
     }
-    private static RenderTarget machineOutputTarget;
+
     public static RenderTarget getMachineOutputTarget() {
         if (machineOutputTarget == null) {
             machineOutputTarget = new MainTarget(Minecraft.getInstance().getMainRenderTarget().width, Minecraft.getInstance().getMainRenderTarget().height);
@@ -39,7 +43,7 @@ public class MachineOutputShader extends PostShaderInstance {
         }
         return machineOutputTarget;
     }
-    static MultiBufferSource.BufferSource machineOutputBufferSource = null;
+
     public static MultiBufferSource.BufferSource createMachineOutputBufferSource() {
         if (machineOutputBufferSource == null) {
             RenderBuffers renderBuffers = Minecraft.getInstance().renderBuffers();
@@ -65,6 +69,7 @@ public class MachineOutputShader extends PostShaderInstance {
             RenderSystem.applyModelViewMatrix();
         }
     }
+
     @SubscribeEvent
     public static void onRenderLevelStage(RenderLevelStageEvent event) {
         if (!ShaderHelper.shouldUseAlternateRendering()) {

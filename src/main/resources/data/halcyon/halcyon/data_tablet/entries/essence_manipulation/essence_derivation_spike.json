@@ -36,6 +36,7 @@
   "parents": [
     "halcyon:essence_manipulation/essence_leech",
     "halcyon:machinery_transformation/lunarium",
-    "halcyon:basics/frozen_moonlight"
+    "halcyon:basics/frozen_moonlight",
+    "halcyon:basics/coolant"
   ]
 }

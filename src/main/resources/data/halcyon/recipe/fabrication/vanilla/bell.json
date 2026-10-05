@@ -1,0 +1,20 @@
+{
+  "type": "halcyon:shaped_fabrication_recipe",
+  "essenceCost": {
+    "halcyon:essence": 200,
+    "halcyon:lunar_essence": 50
+  },
+  "time": 160,
+  "entry": "halcyon:machinery_transformation/crystalline_cradle",
+  "pattern": [
+    "S",
+    "B",
+    "N"
+  ],
+  "key": {
+    "S": { "tag": "c:rods/wooden" },
+    "B": { "item": "halcyon:ecliptrum_block" },
+    "N": { "item": "halcyon:ecliptrum_nugget" }
+  },
+  "result": { "id": "minecraft:bell" }
+}
