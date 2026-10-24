@@ -22,6 +22,7 @@ import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
+import net.neoforged.neoforge.common.crafting.SizedIngredient;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.crafting.FluidIngredient;
 
@@ -150,6 +151,23 @@ public class CraftingPage extends TextPage {
     public void renderIngredientWithTooltip(DataTabletScreen screen, GuiGraphics graphics, Ingredient item, int x, int y, int mouseX, int mouseY) {
         if (!item.isEmpty()) {
             ItemStack currentItem = item.getItems()[(screen.ticks / 20) % item.getItems().length];
+            graphics.renderItem(currentItem, x, y);
+            if (mouseX >= x && mouseY >= y) {
+                if (mouseX <= x + 16 && mouseY <= y + 16) {
+                    showTooltip = true;
+                    tooltipToShow.clear();
+                    for (Component i : Screen.getTooltipFromItem(Minecraft.getInstance(), currentItem)) {
+                        tooltipToShow.add(i.getVisualOrderText());
+                    }
+                }
+            }
+        }
+    }
+
+    public void renderSizedIngredientWithTooltip(DataTabletScreen screen, GuiGraphics graphics, SizedIngredient item, int x, int y, int mouseX, int mouseY) {
+        if (!item.ingredient().isEmpty()) {
+            ItemStack currentItem = item.getItems()[(screen.ticks / 20) % item.getItems().length];
+            // TODO count does not actually render???
             graphics.renderItem(currentItem, x, y);
             if (mouseX >= x && mouseY >= y) {
                 if (mouseX <= x + 16 && mouseY <= y + 16) {

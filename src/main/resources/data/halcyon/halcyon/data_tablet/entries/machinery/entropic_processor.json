@@ -58,6 +58,7 @@
       "type": "halcyon:crafting",
       "recipes": [
         "halcyon:entropic_processing/wool_to_string",
+        "halcyon:entropic_processing/carpet_to_string",
         "halcyon:entropic_processing/clay_to_clay_balls",
         "halcyon:entropic_processing/honeycomb_block_to_honeycomb",
         "halcyon:entropic_processing/dripstone_to_pointed_dripstone",

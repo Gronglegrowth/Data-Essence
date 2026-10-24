@@ -1,0 +1,6 @@
+{
+  "type": "halcyon:entropic_processing",
+  "input": { "tag": "minecraft:wool_carpets", "count": 3 },
+  "time": 100,
+  "result": { "id": "minecraft:string", "count": 8 }
+}

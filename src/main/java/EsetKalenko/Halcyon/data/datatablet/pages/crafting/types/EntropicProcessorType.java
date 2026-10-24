@@ -18,7 +18,7 @@ public class EntropicProcessorType extends CraftingType {
             pGuiGraphics.blit(DataTabletScreen.TEXTURE_CRAFTING, xOffset + x, yOffset + y, 133, 136, 123, 60);
             page.renderIngredientWithTooltip(screen, pGuiGraphics, Ingredient.of(BlockRegistry.ENTROPIC_PROCESSOR.get()), xOffset + x + 74, yOffset + y + 43, pMouseX, pMouseY);
             page.renderItemWithTooltip(pGuiGraphics, recipe.getResultItem(RegistryAccess.EMPTY), xOffset + x + 74, yOffset + y + 22, pMouseX, pMouseY);
-            page.renderIngredientWithTooltip(screen, pGuiGraphics, recipe2.getIngredients().get(0), xOffset + x + 30, yOffset + y + 22, pMouseX, pMouseY);
+            page.renderSizedIngredientWithTooltip(screen, pGuiGraphics, recipe2.getSizedIngredients().get(0), xOffset + x + 30, yOffset + y + 22, pMouseX, pMouseY);
             page.renderCraftTime(pGuiGraphics, recipe2.getTime(), xOffset + x + 74, yOffset + y + 8);
         }
     }

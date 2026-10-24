@@ -27,7 +27,7 @@ public class EMIEntropicProcessingRecipe extends DataNEssenceEMIRecipe {
     public EMIEntropicProcessingRecipe(ResourceLocation id, EntropicProcessingRecipe recipe) {
         super(DataNEssenceEMIPlugin.ENTROPIC_PROCESSING, id, null, 123, 60);
         this.id = id;
-        this.input = recipe.getIngredients().stream().map(s -> EmiIngredient.of(Arrays.stream(s.getItems()).map(EmiStack::of).toList())).toList();
+        this.input = recipe.getSizedIngredients().stream().map(s -> EmiIngredient.of(Arrays.stream(s.getItems()).map(EmiStack::of).toList())).toList();
         this.output = List.of(EmiStack.of(recipe.getResultItem(Minecraft.getInstance().level.registryAccess())));
         this.time = recipe.getTime();
     }
