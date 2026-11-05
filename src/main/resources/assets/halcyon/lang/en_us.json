@@ -292,6 +292,8 @@
   "entity.halcyon.ancient_sentinel_projectile": "Ancient Sentinel Projectile",
   "entity.halcyon.black_hole": "Black Hole",
   "entity.halcyon.essence_slash": "Light Slash",
+  "entity.halcyon.arekko": "Arekko",
+  "entity.halcyon.arekko.death_message": "With this character's death, the thread of reconciliation is severed. Locate another Vault to restore the weave of change, or persist in the forever-scarred world you have created.",
 
   "jukebox_song.halcyon.conductors_lullaby": "Fuzzy - Conductor's Lullaby",
   "jukebox_song.halcyon.under_the_sky": "DavidRarria09 - UnderTheSky",
