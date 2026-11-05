@@ -24,7 +24,8 @@ public class EssenceLeechBlockEntity extends BlockEntity implements EssenceBlock
     public EssenceStorage getStorage() {
         return storage;
     }
-    public int cooldown;
+    public int damageCooldown;
+    public int generationTicks;
 
     public EssenceLeechBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntityRegistry.ESSENCE_LEECH.get(), pos, state);
@@ -32,30 +33,45 @@ public class EssenceLeechBlockEntity extends BlockEntity implements EssenceBlock
     @Override
     protected void saveAdditional(@NotNull CompoundTag tag, HolderLookup.Provider pRegistries) {
         super.saveAdditional(tag, pRegistries);
-        tag.putInt("cooldown", cooldown);
+        tag.putInt("cooldown", damageCooldown);
+        tag.putInt("GenerationTicks", generationTicks);
         tag.put("EssenceStorage", storage.toNbt());
     }
     @Override
     public void loadAdditional(CompoundTag nbt, HolderLookup.Provider pRegistries) {
         super.loadAdditional(nbt, pRegistries);
         storage.fromNbt(nbt.getCompound("EssenceStorage"));
-        cooldown = nbt.getInt("cooldown");
+        damageCooldown = nbt.getInt("cooldown");
+        generationTicks = nbt.getInt("GenerationTicks");
     }
 
-    public static void tick(Level pLevel, BlockPos pPos, BlockState pState, EssenceLeechBlockEntity pBlockEntity) {
+    // TODO right clicking the machine should play particles showing you the AABBs for 1-2 seconds.
+
+    public static void tick(Level pLevel, BlockPos pPos, BlockState pState, EssenceLeechBlockEntity leech) {
         if (!pLevel.isClientSide) {
-            if (pBlockEntity.getStorage().getEssence(EssenceTypeRegistry.ESSENCE.get()) < pBlockEntity.getStorage().getMaxEssence() && pBlockEntity.cooldown <= 0) {
-                for (LivingEntity i : pLevel.getEntitiesOfClass(LivingEntity.class, AABB.ofSize(pPos.getCenter().add(0, 2, 0), 3, 3, 3))) {
-                    if (i.isAlive()) {
-                        i.hurt(i.damageSources().source(DamageTypeRegistry.essenceSiphoned), 5);
-                        if (!i.isAlive()) {
-                            pBlockEntity.getStorage().addEssence(EssenceTypeRegistry.ESSENCE.get(), Math.clamp(i.getMaxHealth() * 5, 0f, 100f));
-                        }
+            if (leech.getStorage().getEssence(EssenceTypeRegistry.ESSENCE.get()) < leech.getStorage().getMaxEssence()) {
+
+                if ( leech.generationTicks > 0) {
+                    leech.getStorage().addEssence(EssenceTypeRegistry.ESSENCE.get(), 4);
+                }
+
+                for (LivingEntity victim : pLevel.getEntitiesOfClass(LivingEntity.class, AABB.ofSize(pPos.getCenter().add(0, 2, 0), 6, 3, 6))) {
+                    if (!victim.isAlive()) {
+                        leech.generationTicks = (int) (leech.generationTicks + Math.clamp(victim.getMaxHealth() * 5, 0, 100));
                     }
                 }
-                pBlockEntity.cooldown = 10;
+
+                if ( leech.damageCooldown <= 0 ) {
+                    for (LivingEntity victim : pLevel.getEntitiesOfClass(LivingEntity.class, AABB.ofSize(pPos.getCenter().add(0, 2, 0), 3, 3, 3))) {
+                        if (victim.isAlive()) {
+                            victim.hurt(victim.damageSources().source(DamageTypeRegistry.essenceSiphoned), 5);
+                        }
+                    }
+
+                    leech.damageCooldown = 10;
+                }
             } else {
-                pBlockEntity.cooldown -= 1;
+                leech.damageCooldown -= 1;
             }
         } else {
             ClientHandler.markFactorySong(pPos);

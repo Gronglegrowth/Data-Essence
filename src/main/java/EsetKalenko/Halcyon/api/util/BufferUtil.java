@@ -36,6 +36,10 @@ public class BufferUtil {
         for (int i = 1; i <= 5; i++) {
             BlockEntity ent = container.getLevel().getBlockEntity(container.getBlockPos().offset(0, -i, 0));
             if (ent instanceof EssenceBufferBlockEntity buffer) {
+
+                if (buffer.getLevel().hasNeighborSignal(buffer.getBlockPos()))
+                    continue;
+
                 for (EssenceType o : types) {
                     var transferredAmount = EssenceStorage.transferEssence(buffer.getStorage(), ((EssenceBlockEntity)container).getStorage(), o, buffer.getStorage().getMaxEssence());
                     if (transferredAmount > 0f)
