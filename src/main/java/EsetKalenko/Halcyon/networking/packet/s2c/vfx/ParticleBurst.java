@@ -1,4 +1,4 @@
-package EsetKalenko.Halcyon.networking.packet.s2c;
+package EsetKalenko.Halcyon.networking.packet.s2c.vfx;
 
 import EsetKalenko.Halcyon.Halcyon;
 import EsetKalenko.Halcyon.client.particle.MoteParticleOptions;

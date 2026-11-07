@@ -6,9 +6,7 @@ import EsetKalenko.Halcyon.networking.packet.c2s.PlayerFinishDataBankMinigame;
 import EsetKalenko.Halcyon.networking.packet.c2s.PlayerSetItemHandlerLocked;
 import EsetKalenko.Halcyon.networking.packet.c2s.RequestMachineEssenceValue;
 import EsetKalenko.Halcyon.networking.packet.s2c.*;
-import EsetKalenko.Halcyon.networking.packet.s2c.vfx.PlayBufferTransferParticle;
-import EsetKalenko.Halcyon.networking.packet.s2c.vfx.PlayEnderPearlRedirectionEffect;
-import EsetKalenko.Halcyon.networking.packet.s2c.vfx.PlayGenderfluidTransitionEffect;
+import EsetKalenko.Halcyon.networking.packet.s2c.vfx.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
@@ -71,18 +69,22 @@ public class ModMessages {
         registrar.playToClient(ComputerDataSync.TYPE, getNetworkCodec(ComputerDataSync::read, ComputerDataSync::write), Handler::handle);
         registrar.playToClient(EntrySync.TYPE, getNetworkCodec(EntrySync::read, EntrySync::write), Handler::handle);
         registrar.playToClient(DragonPartsSync.TYPE, getNetworkCodec(DragonPartsSync::read, DragonPartsSync::write), Handler::handle);
-        registrar.playToClient(PlayBufferTransferParticle.TYPE, getNetworkCodec(PlayBufferTransferParticle::read, PlayBufferTransferParticle::write), Handler::handle);
         registrar.playToClient(PingStructures.TYPE, getNetworkCodec(PingStructures::read, PingStructures::write), Handler::handle);
         registrar.playToClient(PingableSync.TYPE, getNetworkCodec(PingableSync::read, PingableSync::write), Handler::handle);
         registrar.playToClient(CreatePingShader.TYPE, getNetworkCodec(CreatePingShader::read, CreatePingShader::write), Handler::handle);
         registrar.playToClient(GrapplingHookSync.TYPE, getNetworkCodec(GrapplingHookSync::read, GrapplingHookSync::write), Handler::handle);
-        registrar.playToClient(ParticleBurst.TYPE, getNetworkCodec(ParticleBurst::read, ParticleBurst::write), Handler::handle);
-        registrar.playToClient(PlayGenderfluidTransitionEffect.TYPE, getNetworkCodec(PlayGenderfluidTransitionEffect::read, PlayGenderfluidTransitionEffect::write), Handler::handle);
-        registrar.playToClient(PlayEnderPearlRedirectionEffect.TYPE, getNetworkCodec(PlayEnderPearlRedirectionEffect::read, PlayEnderPearlRedirectionEffect::write), Handler::handle);
         registrar.playToClient(MachineEssenceValueSync.TYPE, getNetworkCodec(MachineEssenceValueSync::read, MachineEssenceValueSync::write), Handler::handle);
         registrar.playToClient(AddScannedOre.TYPE, getNetworkCodec(AddScannedOre::read, AddScannedOre::write), Handler::handle);
         registrar.playToClient(OpenEntryEditor.TYPE, getNetworkCodec(OpenEntryEditor::read, OpenEntryEditor::write), Handler::handle);
         registrar.playToClient(StructureMusicSync.TYPE, getNetworkCodec(StructureMusicSync::read, StructureMusicSync::write), Handler::handle);
+
+        // FX
+        registrar.playToClient(PlayBufferTransferParticle.TYPE, getNetworkCodec(PlayBufferTransferParticle::read, PlayBufferTransferParticle::write), Handler::handle);
+        registrar.playToClient(ParticleBurst.TYPE, getNetworkCodec(ParticleBurst::read, ParticleBurst::write), Handler::handle);
+        registrar.playToClient(PlayGenderfluidTransitionEffect.TYPE, getNetworkCodec(PlayGenderfluidTransitionEffect::read, PlayGenderfluidTransitionEffect::write), Handler::handle);
+        registrar.playToClient(PlayEnderPearlRedirectionEffect.TYPE, getNetworkCodec(PlayEnderPearlRedirectionEffect::read, PlayEnderPearlRedirectionEffect::write), Handler::handle);
+        registrar.playToClient(PlayDissipationFXSingleBlock.TYPE, getNetworkCodec(PlayDissipationFXSingleBlock::read, PlayDissipationFXSingleBlock::write), Handler::handle);
+
         //C2S
         registrar.playToServer(PlayerFinishDataBankMinigame.TYPE, getNetworkCodec(PlayerFinishDataBankMinigame::read, PlayerFinishDataBankMinigame::write), Handler::handle);
         registrar.playToServer(PlayerChangeDriveData.TYPE, getNetworkCodec(PlayerChangeDriveData::read, PlayerChangeDriveData::write), Handler::handle);

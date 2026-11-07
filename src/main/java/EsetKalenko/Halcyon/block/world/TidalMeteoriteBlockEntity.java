@@ -2,7 +2,7 @@ package EsetKalenko.Halcyon.block.world;
 
 import EsetKalenko.Halcyon.client.particle.CircleParticleOptions;
 import EsetKalenko.Halcyon.networking.ModMessages;
-import EsetKalenko.Halcyon.networking.packet.s2c.ParticleBurst;
+import EsetKalenko.Halcyon.networking.packet.s2c.vfx.ParticleBurst;
 import EsetKalenko.Halcyon.registry.BlockEntityRegistry;
 import EsetKalenko.Halcyon.registry.BlockRegistry;
 import EsetKalenko.Halcyon.registry.EssenceTypeRegistry;
