@@ -16,19 +16,23 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.items.SlotItemHandler;
 
 public class EssenceBurnerMenu extends AbstractContainerMenu implements IDataNEssenceMenuHelper {
+    public final EssenceBurnerBlockEntity blockEntity;
+    private final Level level;
+
     @Override
     public ItemStack quickMoveStack(Player player, int index) {
         return guiHelperQuickMoveStack(player, index, 2, this);
     }
+
     @Override
     public boolean guiHelperMoveItemStackTo(ItemStack pStack, int pStartIndex, int pEndIndex, boolean pReverseDirection) {
         return moveItemStackTo(pStack, pStartIndex, pEndIndex, pReverseDirection);
     }
-    public final EssenceBurnerBlockEntity blockEntity;
-    private final Level level;
+
     public EssenceBurnerMenu(int pContainerId, Inventory inv, FriendlyByteBuf extraData) {
         this(pContainerId, inv, inv.player.level().getBlockEntity(extraData.readBlockPos()));
     }
+
     public EssenceBurnerMenu(int pContainerId, Inventory inv, BlockEntity entity) {
         super(MenuRegistry.ESSENCE_BURNER_MENU.get(), pContainerId);
         blockEntity = ((EssenceBurnerBlockEntity) entity);

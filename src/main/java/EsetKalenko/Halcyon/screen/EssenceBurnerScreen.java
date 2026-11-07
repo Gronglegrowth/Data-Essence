@@ -20,9 +20,11 @@ import java.util.List;
 
 public class EssenceBurnerScreen extends AbstractContainerScreen<EssenceBurnerMenu> {
     public static final ResourceLocation TEXTURE = Halcyon.locate("textures/gui/essence_burner.png");
+
     public EssenceBurnerScreen(EssenceBurnerMenu pMenu, Inventory pPlayerInventory, Component pTitle) {
         super(pMenu, pPlayerInventory, pTitle);
     }
+
     @Override
     protected void renderBg(GuiGraphics pGuiGraphics, float pPartialTick, int pMouseX, int pMouseY) {
         RenderSystem.setShader(GameRenderer::getPositionTexShader);

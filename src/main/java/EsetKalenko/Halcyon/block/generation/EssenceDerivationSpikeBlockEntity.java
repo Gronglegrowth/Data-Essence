@@ -1,5 +1,6 @@
 package EsetKalenko.Halcyon.block.generation;
 
+import EsetKalenko.Halcyon.networking.packet.s2c.vfx.PlayDissipationFXSingleBlock;
 import com.cmdpro.databank.model.animation.DatabankAnimationReference;
 import com.cmdpro.databank.model.animation.DatabankAnimationState;
 import com.cmdpro.databank.multiblock.Multiblock;
@@ -34,7 +35,10 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
+
+import java.awt.*;
 
 public class EssenceDerivationSpikeBlockEntity extends BlockEntity implements EssenceBlockEntity, Overheatable {
     public SingleEssenceContainer storage = new SingleEssenceContainer(EssenceTypeRegistry.ESSENCE.get(), 2000f);
@@ -99,6 +103,8 @@ public class EssenceDerivationSpikeBlockEntity extends BlockEntity implements Es
         return(hasRedstone && hasStructure && !isBroken);
     }
 
+    // TODO give the big guy same treatment as leech
+
     public static void tick(Level world, BlockPos pos, BlockState state, EssenceDerivationSpikeBlockEntity spike) {
         if (!world.isClientSide()) {
             boolean hadStructure = spike.hasStructure;
@@ -106,6 +112,17 @@ public class EssenceDerivationSpikeBlockEntity extends BlockEntity implements Es
             if (hadStructure && !spike.hasStructure) {
                 spike.updateBlock();
             }
+
+            var dissipateTick = world.random.nextInt() % 17 == 0;
+                    //&& spike.generationTicks <= 0;
+
+            if ( dissipateTick && spike.getStorage().getEssence(EssenceTypeRegistry.ESSENCE.get()) >= 1 ) {
+                spike.getStorage().removeEssence(EssenceTypeRegistry.ESSENCE.get(), 1);
+                PacketDistributor.sendToPlayersNear(
+                        (ServerLevel) world, null, pos.getX(), pos.getY(),pos.getZ(),
+                        16d, new PlayDissipationFXSingleBlock(pos, new Color(EssenceTypeRegistry.ESSENCE.get().color)));
+            }
+
             if (spike.hasStructure) {
 
                 if (spike.isRedstonePowered() && spike.getStorage().getEssence(EssenceTypeRegistry.ESSENCE.get()) < spike.getStorage().getMaxEssence() && spike.cooldown <= 0 && !spike.isBroken) {

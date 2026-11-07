@@ -4,10 +4,12 @@ import EsetKalenko.Halcyon.api.DataNEssenceRegistries;
 import EsetKalenko.Halcyon.api.block.Machine;
 import EsetKalenko.Halcyon.api.essence.EssenceBlockEntity;
 import EsetKalenko.Halcyon.api.essence.EssenceStorage;
+import EsetKalenko.Halcyon.api.essence.EssenceType;
 import EsetKalenko.Halcyon.api.essence.container.MultiEssenceContainer;
 import EsetKalenko.Halcyon.api.util.BufferUtil;
 import EsetKalenko.Halcyon.client.particle.CircleShadeParticleOptions;
 import EsetKalenko.Halcyon.datamaps.HalcyonDatamaps;
+import EsetKalenko.Halcyon.networking.packet.s2c.vfx.PlayDissipationFXSingleBlock;
 import EsetKalenko.Halcyon.registry.BlockEntityRegistry;
 import EsetKalenko.Halcyon.registry.EssenceTypeRegistry;
 import EsetKalenko.Halcyon.screen.EssenceBurnerMenu;
@@ -19,6 +21,7 @@ import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.*;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -33,6 +36,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import net.neoforged.neoforge.items.wrapper.CombinedInvWrapper;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -149,6 +153,20 @@ public class EssenceBurnerBlockEntity extends BlockEntity implements MenuProvide
         if (!world.isClientSide()) {
             BufferUtil.getItemsFromBuffersBelow(burner, burner.itemHandler);
             burner.lit = false;
+
+            var dissipateTick = world.random.nextInt() % 17 == 0;
+            // TODO make this also generate over time?
+
+            if ( dissipateTick ) {
+                for ( EssenceType type : burner.getStorage().getSupportedEssenceTypes() ) {
+                    if ( burner.getStorage().getEssence(type) >= 1 ) {
+                        burner.getStorage().removeEssence(type, 1);
+                        PacketDistributor.sendToPlayersNear(
+                                (ServerLevel) world, null, pos.getX(), pos.getY(),pos.getZ(),
+                                16d, new PlayDissipationFXSingleBlock(pos, new Color(type.color)));
+                    }
+                }
+            }
 
             if (burner.itemHandler.getStackInSlot(0).getItemHolder().getData(HalcyonDatamaps.SHARD_SUBLIMATION) == null)
                 return;

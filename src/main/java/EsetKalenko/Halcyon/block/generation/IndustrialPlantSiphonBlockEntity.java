@@ -1,6 +1,7 @@
 package EsetKalenko.Halcyon.block.generation;
 
 import EsetKalenko.Halcyon.datamaps.HalcyonDatamaps;
+import EsetKalenko.Halcyon.networking.packet.s2c.vfx.PlayDissipationFXSingleBlock;
 import com.cmdpro.databank.model.animation.DatabankAnimationReference;
 import com.cmdpro.databank.model.animation.DatabankAnimationState;
 import EsetKalenko.Halcyon.api.block.Machine;
@@ -22,6 +23,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.SimpleContainer;
@@ -35,9 +37,11 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import net.neoforged.neoforge.items.wrapper.CombinedInvWrapper;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.awt.*;
 import java.util.List;
 
 public class IndustrialPlantSiphonBlockEntity extends BlockEntity implements MenuProvider, EssenceBlockEntity, Machine {
@@ -144,6 +148,16 @@ public class IndustrialPlantSiphonBlockEntity extends BlockEntity implements Men
 
     public static void tick(Level world, BlockPos pos, BlockState state, IndustrialPlantSiphonBlockEntity tile) {
         if (!world.isClientSide()) {
+            var dissipateTick = world.random.nextInt() % 17 == 0
+                    && tile.essenceGenerationTicks <= 0;
+
+            if ( dissipateTick && tile.getStorage().getEssence(EssenceTypeRegistry.ESSENCE.get()) >= 1 ) {
+                tile.getStorage().removeEssence(EssenceTypeRegistry.ESSENCE.get(), 1);
+                PacketDistributor.sendToPlayersNear(
+                        (ServerLevel) world, null, pos.getX(), pos.getY(),pos.getZ(),
+                        16d, new PlayDissipationFXSingleBlock(pos, new Color(EssenceTypeRegistry.ESSENCE.get().color)));
+            }
+
             BufferUtil.getItemsFromBuffersBelow(tile, tile.itemHandler);
             if (tile.essenceGenerationTicks > 0) {
                 if ( !(tile.storage.getEssence(EssenceTypeRegistry.ESSENCE.get()) + tile.generationRate > tile.storage.getMaxEssence()) ) {
