@@ -1,5 +1,7 @@
 package EsetKalenko.Halcyon.block.processing;
 
+import EsetKalenko.Halcyon.api.util.DissipationUtil;
+import EsetKalenko.Halcyon.networking.packet.s2c.vfx.PlayDissipationFXSingleBlock;
 import EsetKalenko.Halcyon.registry.*;
 import com.cmdpro.databank.model.animation.DatabankAnimationReference;
 import com.cmdpro.databank.model.animation.DatabankAnimationState;
@@ -23,6 +25,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
@@ -45,9 +48,11 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import net.neoforged.neoforge.items.wrapper.CombinedInvWrapper;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.awt.*;
 import java.util.List;
 import java.util.Optional;
 
@@ -191,22 +196,25 @@ public class EntropicProcessorBlockEntity extends BlockEntity implements MenuPro
     public float essenceCost;
 
 
-    public static void tick(Level pLevel, BlockPos pPos, BlockState pState, EntropicProcessorBlockEntity pBlockEntity) {
-        if (!pLevel.isClientSide()) {
+    public static void tick(Level world, BlockPos pos, BlockState pState, EntropicProcessorBlockEntity grindingChampion) {
+        if (!world.isClientSide()) {
 
-            BufferUtil.getEssenceFromBuffersBelow(pBlockEntity, EssenceTypeRegistry.ESSENCE.get());
-            BufferUtil.getItemsFromBuffersBelow(pBlockEntity, pBlockEntity.itemHandler);
+            DissipationUtil.dissipate(world.random.nextInt() % 17 == 0 && grindingChampion.workTime < 0,
+                    grindingChampion, world, pos);
+
+            BufferUtil.getEssenceFromBuffersBelow(grindingChampion, EssenceTypeRegistry.ESSENCE.get());
+            BufferUtil.getItemsFromBuffersBelow(grindingChampion, grindingChampion.itemHandler);
 
 
             // Get the list of items inside the block
-            List<ItemEntity> items = getItemsAt(pLevel, pPos);
+            List<ItemEntity> items = getItemsAt(world, pos);
 
             // Loop through them and try to add them to the inventory
             for (ItemEntity itemEntity : items) {
                 ItemStack stack = itemEntity.getItem();
 
                 // Try to insert into the input
-                ItemStack remainder = pBlockEntity.itemHandler.insertItem(0, stack, false);
+                ItemStack remainder = grindingChampion.itemHandler.insertItem(0, stack, false);
 
                 //update the itemstack
                 if (remainder.isEmpty()) {
@@ -217,44 +225,44 @@ public class EntropicProcessorBlockEntity extends BlockEntity implements MenuPro
             }
 
             boolean resetWorkTime = true;
-            if (pBlockEntity.getStorage().getEssence(EssenceTypeRegistry.ESSENCE.get()) >= 1) {
+            if (grindingChampion.getStorage().getEssence(EssenceTypeRegistry.ESSENCE.get()) >= 1) {
 
-                if (pBlockEntity.recipe != null) {
-                    ItemStack assembled = pBlockEntity.recipe.assemble(pBlockEntity.getCraftingInv(), pLevel.registryAccess());
-                    if (pBlockEntity.outputItemHandler.insertItem(0, assembled, true).isEmpty()) {
-                        for (LivingEntity victim : pLevel.getEntitiesOfClass(LivingEntity.class, AABB.ofSize(pPos.getCenter(), 0.9f, 0.9f, 0.9f))) {
+                if (grindingChampion.recipe != null) {
+                    ItemStack assembled = grindingChampion.recipe.assemble(grindingChampion.getCraftingInv(), world.registryAccess());
+                    if (grindingChampion.outputItemHandler.insertItem(0, assembled, true).isEmpty()) {
+                        for (LivingEntity victim : world.getEntitiesOfClass(LivingEntity.class, AABB.ofSize(pos.getCenter(), 0.9f, 0.9f, 0.9f))) {
                             victim.hurt(victim.damageSources().source(DamageTypeRegistry.crushed), 2f);
                         }
                         resetWorkTime = false;
-                        pBlockEntity.workTime++;
-                        pBlockEntity.getStorage().removeEssence(EssenceTypeRegistry.ESSENCE.get(), 1);
+                        grindingChampion.workTime++;
+                        grindingChampion.getStorage().removeEssence(EssenceTypeRegistry.ESSENCE.get(), 1);
 
-                        if (pBlockEntity.workTime >= pBlockEntity.recipe.getTime()) {
-                            pBlockEntity.outputItemHandler.insertItem(0, assembled, false);
-                            pBlockEntity.itemHandler.extractItem(0, 1, false);
-                            pBlockEntity.workTime = 0;
+                        if (grindingChampion.workTime >= grindingChampion.recipe.getTime()) {
+                            grindingChampion.outputItemHandler.insertItem(0, assembled, false);
+                            grindingChampion.itemHandler.extractItem(0, 1, false);
+                            grindingChampion.workTime = 0;
                         }
                     }
                 }
             }
             if (resetWorkTime) {
-                pBlockEntity.workTime = -1;
+                grindingChampion.workTime = -1;
             }
-            pBlockEntity.item = pBlockEntity.itemHandler.getStackInSlot(0);
-            pBlockEntity.updateBlock();
+            grindingChampion.item = grindingChampion.itemHandler.getStackInSlot(0);
+            grindingChampion.updateBlock();
         } else {
-            if (pBlockEntity.workTime >= 0) {
-                if (!pBlockEntity.clientHandler.isSoundPlaying()) {
-                    pBlockEntity.clientHandler.startSound();
+            if (grindingChampion.workTime >= 0) {
+                if (!grindingChampion.clientHandler.isSoundPlaying()) {
+                    grindingChampion.clientHandler.startSound();
                 }
-                if (pBlockEntity.item != null && !pBlockEntity.item.isEmpty()) {
-                    Vec3 particlePos = pPos.getCenter().add(0, 0.25, 0);
-                    Vec3 particleSpeed = Vec3.directionFromRotation(0, pLevel.getRandom().nextIntBetweenInclusive(-180, 180)).scale(0.1).add(0, 0.25, 0);
-                    pLevel.addParticle(new ItemParticleOption(ParticleTypes.ITEM, pBlockEntity.item), particlePos.x, particlePos.y, particlePos.z, particleSpeed.x, particleSpeed.y, particleSpeed.z);
+                if (grindingChampion.item != null && !grindingChampion.item.isEmpty()) {
+                    Vec3 particlePos = pos.getCenter().add(0, 0.25, 0);
+                    Vec3 particleSpeed = Vec3.directionFromRotation(0, world.getRandom().nextIntBetweenInclusive(-180, 180)).scale(0.1).add(0, 0.25, 0);
+                    world.addParticle(new ItemParticleOption(ParticleTypes.ITEM, grindingChampion.item), particlePos.x, particlePos.y, particlePos.z, particleSpeed.x, particleSpeed.y, particleSpeed.z);
                 }
             } else {
-                if (pBlockEntity.clientHandler.isSoundPlaying()) {
-                    pBlockEntity.clientHandler.stopSound();
+                if (grindingChampion.clientHandler.isSoundPlaying()) {
+                    grindingChampion.clientHandler.stopSound();
                 }
             }
         }

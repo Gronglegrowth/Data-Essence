@@ -5,6 +5,8 @@ import EsetKalenko.Halcyon.api.essence.EssenceBlockEntity;
 import EsetKalenko.Halcyon.api.essence.EssenceStorage;
 import EsetKalenko.Halcyon.api.essence.container.SingleEssenceContainer;
 import EsetKalenko.Halcyon.api.util.BufferUtil;
+import EsetKalenko.Halcyon.api.util.DissipationUtil;
+import EsetKalenko.Halcyon.networking.packet.s2c.vfx.PlayDissipationFXSingleBlock;
 import EsetKalenko.Halcyon.recipe.DryingRecipe;
 import EsetKalenko.Halcyon.recipe.RecipeInputWithFluid;
 import EsetKalenko.Halcyon.registry.BlockEntityRegistry;
@@ -18,6 +20,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.SimpleContainer;
@@ -37,9 +40,11 @@ import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import net.neoforged.neoforge.items.wrapper.CombinedInvWrapper;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -152,6 +157,9 @@ public class DryingTableBlockEntity extends BlockEntity implements MenuProvider,
 
     public static void tick(Level world, BlockPos pos, BlockState state, DryingTableBlockEntity dryingTable) {
         if (!world.isClientSide()) {
+            DissipationUtil.dissipate(world.random.nextInt() % 17 == 0 && dryingTable.workTime < 0,
+                    dryingTable, world, pos);
+
             BufferUtil.getEssenceFromBuffersBelow(dryingTable, EssenceTypeRegistry.ESSENCE.get());
             BufferUtil.getFluidsFromBuffersBelow(dryingTable, dryingTable.fluidHandler);
             BufferUtil.getItemsFromBuffersBelow(dryingTable, dryingTable.itemHandler);

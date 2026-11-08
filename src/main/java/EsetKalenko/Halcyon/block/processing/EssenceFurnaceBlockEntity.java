@@ -5,6 +5,8 @@ import EsetKalenko.Halcyon.api.essence.EssenceBlockEntity;
 import EsetKalenko.Halcyon.api.essence.EssenceStorage;
 import EsetKalenko.Halcyon.api.essence.container.SingleEssenceContainer;
 import EsetKalenko.Halcyon.api.util.BufferUtil;
+import EsetKalenko.Halcyon.api.util.DissipationUtil;
+import EsetKalenko.Halcyon.networking.packet.s2c.vfx.PlayDissipationFXSingleBlock;
 import EsetKalenko.Halcyon.registry.BlockEntityRegistry;
 import EsetKalenko.Halcyon.registry.EssenceTypeRegistry;
 import EsetKalenko.Halcyon.screen.EssenceFurnaceMenu;
@@ -15,6 +17,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.SimpleContainer;
@@ -29,9 +32,11 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import net.neoforged.neoforge.items.wrapper.CombinedInvWrapper;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.awt.*;
 import java.util.List;
 import java.util.Optional;
 
@@ -165,6 +170,9 @@ public class EssenceFurnaceBlockEntity extends BlockEntity implements MenuProvid
 
     public static void tick(Level world, BlockPos pos, BlockState state, EssenceFurnaceBlockEntity furnace) {
         if (!world.isClientSide()) {
+            DissipationUtil.dissipate(world.random.nextInt() % 17 == 0 && furnace.workTime < 0,
+                    furnace, world, pos);
+
             BufferUtil.getEssenceFromBuffersBelow(furnace, EssenceTypeRegistry.ESSENCE.get());
             BufferUtil.getItemsFromBuffersBelow(furnace, furnace.itemHandler);
 

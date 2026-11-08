@@ -4,6 +4,8 @@ import EsetKalenko.Halcyon.api.essence.EssenceBlockEntity;
 import EsetKalenko.Halcyon.api.essence.EssenceStorage;
 import EsetKalenko.Halcyon.api.essence.container.SingleEssenceContainer;
 import EsetKalenko.Halcyon.api.util.BufferUtil;
+import EsetKalenko.Halcyon.api.util.DissipationUtil;
+import EsetKalenko.Halcyon.networking.packet.s2c.vfx.PlayDissipationFXSingleBlock;
 import EsetKalenko.Halcyon.registry.BlockEntityRegistry;
 import EsetKalenko.Halcyon.registry.EssenceTypeRegistry;
 import net.minecraft.core.BlockPos;
@@ -22,8 +24,10 @@ import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 
+import java.awt.*;
 import java.util.List;
 
 public class SimpleHarvesterBlockEntity extends BlockEntity implements EssenceBlockEntity {
@@ -43,6 +47,8 @@ public class SimpleHarvesterBlockEntity extends BlockEntity implements EssenceBl
 
     public static void tick(Level world, BlockPos pos, BlockState state, SimpleHarvesterBlockEntity tile) {
         if ( !world.isClientSide ) {
+            DissipationUtil.dissipate(world.random.nextInt() % 17 == 0,
+                    tile, world, pos);
 
             BufferUtil.getEssenceFromBuffersBelow(tile, EssenceTypeRegistry.ESSENCE.get());
 

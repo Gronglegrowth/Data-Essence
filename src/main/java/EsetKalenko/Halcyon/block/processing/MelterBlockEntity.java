@@ -5,6 +5,7 @@ import EsetKalenko.Halcyon.api.essence.EssenceBlockEntity;
 import EsetKalenko.Halcyon.api.essence.EssenceStorage;
 import EsetKalenko.Halcyon.api.essence.container.SingleEssenceContainer;
 import EsetKalenko.Halcyon.api.util.BufferUtil;
+import EsetKalenko.Halcyon.api.util.DissipationUtil;
 import EsetKalenko.Halcyon.recipe.MeltingRecipe;
 import EsetKalenko.Halcyon.registry.BlockEntityRegistry;
 import EsetKalenko.Halcyon.registry.EssenceTypeRegistry;
@@ -173,8 +174,11 @@ public class MelterBlockEntity extends BlockEntity implements MenuProvider, Esse
     public MeltingRecipe recipe;
     public float essenceCost;
     public int drainCooldown;
-    public static void tick(Level pLevel, BlockPos pPos, BlockState pState, MelterBlockEntity pBlockEntity) {
-        if (!pLevel.isClientSide()) {
+    public static void tick(Level world, BlockPos pos, BlockState pState, MelterBlockEntity pBlockEntity) {
+        if (!world.isClientSide()) {
+            DissipationUtil.dissipate(world.random.nextInt() % 17 == 0 && pBlockEntity.workTime < 0,
+                    pBlockEntity, world, pos);
+
             BufferUtil.getEssenceFromBuffersBelow(pBlockEntity, EssenceTypeRegistry.ESSENCE.get());
             BufferUtil.getItemsFromBuffersBelow(pBlockEntity, pBlockEntity.itemHandler);
             BufferUtil.getFluidsFromBuffersBelow(pBlockEntity, pBlockEntity.fuelFluidHandler);

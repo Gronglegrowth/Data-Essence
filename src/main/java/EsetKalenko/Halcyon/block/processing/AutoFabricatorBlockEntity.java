@@ -1,5 +1,7 @@
 package EsetKalenko.Halcyon.block.processing;
 
+import EsetKalenko.Halcyon.api.util.DissipationUtil;
+import EsetKalenko.Halcyon.networking.packet.s2c.vfx.PlayDissipationFXSingleBlock;
 import EsetKalenko.Halcyon.registry.*;
 import com.cmdpro.databank.model.animation.DatabankAnimationReference;
 import com.cmdpro.databank.model.animation.DatabankAnimationState;
@@ -27,6 +29,7 @@ import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.*;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -42,10 +45,13 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import net.neoforged.neoforge.items.wrapper.CombinedInvWrapper;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 
 public class AutoFabricatorBlockEntity extends BlockEntity implements MenuProvider, ILockableContainer, EssenceBlockEntity, Machine {
     public DatabankAnimationState animState = new DatabankAnimationState("idle")
@@ -305,6 +311,9 @@ public class AutoFabricatorBlockEntity extends BlockEntity implements MenuProvid
     public static void tick(Level world, BlockPos pos, BlockState state, AutoFabricatorBlockEntity fabricator) {
 
         if (!world.isClientSide()) {
+            DissipationUtil.dissipate(world.random.nextInt() % 17 == 0 && fabricator.craftingProgress < 0,
+                    fabricator, world, pos);
+
             BufferUtil.getEssenceFromBuffersBelow(fabricator, List.of(EssenceTypeRegistry.ESSENCE.get(), EssenceTypeRegistry.LUNAR_ESSENCE.get(), EssenceTypeRegistry.NATURAL_ESSENCE.get(), EssenceTypeRegistry.EXOTIC_ESSENCE.get()));
 
             if (!fabricator.areSlotsLocked())

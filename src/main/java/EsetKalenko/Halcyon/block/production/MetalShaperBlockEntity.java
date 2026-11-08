@@ -1,5 +1,6 @@
 package EsetKalenko.Halcyon.block.production;
 
+import EsetKalenko.Halcyon.api.util.DissipationUtil;
 import EsetKalenko.Halcyon.registry.*;
 import com.cmdpro.databank.model.animation.DatabankAnimationReference;
 import com.cmdpro.databank.model.animation.DatabankAnimationState;
@@ -250,20 +251,24 @@ public class MetalShaperBlockEntity extends BlockEntity implements MenuProvider,
         }
     }
 
-    public static void tick(Level pLevel, BlockPos pPos, BlockState pState, MetalShaperBlockEntity pBlockEntity) {
-        if (!pLevel.isClientSide()) {
+    public static void tick(Level world, BlockPos pos, BlockState pState, MetalShaperBlockEntity pBlockEntity) {
+        if (!world.isClientSide()) {
+
+            DissipationUtil.dissipate(world.random.nextInt() % 17 == 0 && pBlockEntity.workTime < 0,
+                    pBlockEntity, world, pos);
+
             BufferUtil.getEssenceFromBuffersBelow(pBlockEntity, EssenceTypeRegistry.ESSENCE.get());
             BufferUtil.getItemsFromBuffersBelow(pBlockEntity, pBlockEntity.itemHandler);
             boolean resetWorkTime = true;
             if (pBlockEntity.recipe != null) {
                 if (pBlockEntity.getStorage().getEssence(EssenceTypeRegistry.ESSENCE.get()) > 0) {
-                    ItemStack assembled = pBlockEntity.recipe.assemble(pBlockEntity.getCraftingInv(), pLevel.registryAccess());
+                    ItemStack assembled = pBlockEntity.recipe.assemble(pBlockEntity.getCraftingInv(), world.registryAccess());
                     if (pBlockEntity.outputItemHandler.insertItem(0, assembled, true).isEmpty()) {
                         resetWorkTime = false;
                         // working vfx
-                        if (pLevel.random.nextInt() % 20 == 0) {
-                            pLevel.playSound(null, pPos, SoundRegistry.METAL_SHAPER_CRAFTING.value(), SoundSource.BLOCKS, 0.4f, 1f);
-                            ((ServerLevel) pLevel).sendParticles(ParticleTypes.SMOKE, pPos.getCenter().x, pPos.getCenter().y, pPos.getCenter().z, 5, 0, 0, 0, 0);
+                        if (world.random.nextInt() % 20 == 0) {
+                            world.playSound(null, pos, SoundRegistry.METAL_SHAPER_CRAFTING.value(), SoundSource.BLOCKS, 0.4f, 1f);
+                            ((ServerLevel) world).sendParticles(ParticleTypes.SMOKE, pos.getCenter().x, pos.getCenter().y, pos.getCenter().z, 5, 0, 0, 0, 0);
                         }
                         pBlockEntity.workTime++;
                         pBlockEntity.getStorage().removeEssence(EssenceTypeRegistry.ESSENCE.get(), 1);
@@ -281,7 +286,7 @@ public class MetalShaperBlockEntity extends BlockEntity implements MenuProvider,
             pBlockEntity.updateBlock();
         } else {
             if (pBlockEntity.workTime >= 0)
-                ClientHandler.markFactorySong(pPos);
+                ClientHandler.markFactorySong(pos);
         }
     }
 

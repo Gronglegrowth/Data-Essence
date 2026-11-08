@@ -1,7 +1,7 @@
 package EsetKalenko.Halcyon.networking.packet.s2c.vfx;
 
 import EsetKalenko.Halcyon.Halcyon;
-import EsetKalenko.Halcyon.client.particle.MoteParticleOptions;
+import EsetKalenko.Halcyon.client.particle.CircleShadeParticleOptions;
 import EsetKalenko.Halcyon.networking.Message;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
@@ -43,7 +43,7 @@ public record PlayDissipationFXSingleBlock(BlockPos pos, Color color) implements
 
         RandomSource random = world.getRandom();
 
-        var drip = new MoteParticleOptions()
+        var drip = new CircleShadeParticleOptions()
                 .setColor(color)
                 .setAdditive(true)
                 .setFriction(0f)

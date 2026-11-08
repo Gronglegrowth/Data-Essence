@@ -8,6 +8,8 @@ import EsetKalenko.Halcyon.api.essence.EssenceType;
 import EsetKalenko.Halcyon.api.essence.container.MultiEssenceContainer;
 import EsetKalenko.Halcyon.api.util.BufferUtil;
 import EsetKalenko.Halcyon.api.util.DataTabletUtil;
+import EsetKalenko.Halcyon.api.util.DissipationUtil;
+import EsetKalenko.Halcyon.networking.packet.s2c.vfx.PlayDissipationFXSingleBlock;
 import EsetKalenko.Halcyon.recipe.IFabricationRecipe;
 import EsetKalenko.Halcyon.recipe.NonMenuCraftingContainer;
 import EsetKalenko.Halcyon.registry.HalcyonCriteria;
@@ -24,6 +26,7 @@ import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.*;
@@ -40,9 +43,12 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import net.neoforged.neoforge.items.wrapper.CombinedInvWrapper;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 
 public abstract class BaseFabricatorBlockEntity extends BlockEntity implements EssenceBlockEntity, PlayerOwned {
     public MultiEssenceContainer storage = new MultiEssenceContainer(getSupportedEssenceTypes(), getMaxEssence());
@@ -308,6 +314,9 @@ public abstract class BaseFabricatorBlockEntity extends BlockEntity implements E
 
     public void tick(Level world, BlockPos pPos, BlockState pState, BaseFabricatorBlockEntity fabricator) {
         if (!world.isClientSide()) {
+            DissipationUtil.dissipate(world.random.nextInt() % 17 == 0 && fabricator.time < 0,
+                    fabricator, world, pPos);
+
             BufferUtil.getEssenceFromBuffersBelow(fabricator, fabricator.getSupportedEssenceTypes());
             if (fabricator.recipe != null && isNotTryingToCraftBrokenRecipe()) {
 

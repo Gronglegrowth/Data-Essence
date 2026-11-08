@@ -1,6 +1,8 @@
 package EsetKalenko.Halcyon.block.auxiliary;
 
 import EsetKalenko.Halcyon.api.block.RedstoneMonitorable;
+import EsetKalenko.Halcyon.api.util.DissipationUtil;
+import EsetKalenko.Halcyon.networking.packet.s2c.vfx.PlayDissipationFXSingleBlock;
 import com.cmdpro.databank.model.animation.DatabankAnimationReference;
 import com.cmdpro.databank.model.animation.DatabankAnimationState;
 import EsetKalenko.Halcyon.api.DataNEssenceRegistries;
@@ -19,6 +21,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.SimpleContainer;
@@ -30,8 +33,10 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import net.neoforged.neoforge.items.wrapper.CombinedInvWrapper;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 
+import java.awt.*;
 import java.util.List;
 
 public class ChargerBlockEntity extends BlockEntity implements EssenceBlockEntity, RedstoneMonitorable {
@@ -153,6 +158,10 @@ public class ChargerBlockEntity extends BlockEntity implements EssenceBlockEntit
                 }
             }
             pBlockEntity.itemHandler.setStackInSlot(0, stack);
+
+            DissipationUtil.dissipate(pLevel.random.nextInt() % 17 == 0 && pBlockEntity.charging,
+                    pBlockEntity, pLevel, pPos);
+
             pBlockEntity.updateBlock();
         }
     }

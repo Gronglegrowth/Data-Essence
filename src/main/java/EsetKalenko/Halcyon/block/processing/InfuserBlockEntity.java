@@ -1,5 +1,7 @@
 package EsetKalenko.Halcyon.block.processing;
 
+import EsetKalenko.Halcyon.api.util.DissipationUtil;
+import EsetKalenko.Halcyon.networking.packet.s2c.vfx.PlayDissipationFXSingleBlock;
 import EsetKalenko.Halcyon.registry.*;
 import com.cmdpro.databank.model.animation.DatabankAnimationReference;
 import com.cmdpro.databank.model.animation.DatabankAnimationState;
@@ -23,6 +25,7 @@ import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.*;
 import net.minecraft.world.entity.player.Inventory;
@@ -39,6 +42,7 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import net.neoforged.neoforge.items.wrapper.CombinedInvWrapper;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -211,38 +215,41 @@ public class InfuserBlockEntity extends BlockEntity implements MenuProvider, Ess
     public InfusionRecipe recipe;
     public boolean enoughEssence;
     public Map<ResourceLocation, Float> essenceCost;
-    public static void tick(Level pLevel, BlockPos pPos, BlockState pState, InfuserBlockEntity pBlockEntity) {
-        if (!pLevel.isClientSide()) {
-            BufferUtil.getEssenceFromBuffersBelow(pBlockEntity, List.of(EssenceTypeRegistry.ESSENCE.get(), EssenceTypeRegistry.LUNAR_ESSENCE.get(), EssenceTypeRegistry.NATURAL_ESSENCE.get(), EssenceTypeRegistry.EXOTIC_ESSENCE.get()));
-            BufferUtil.getItemsFromBuffersBelow(pBlockEntity, pBlockEntity.itemHandler);
-            pBlockEntity.item = pBlockEntity.itemHandler.getStackInSlot(0);
+    public static void tick(Level world, BlockPos pPos, BlockState pState, InfuserBlockEntity tile) {
+        if (!world.isClientSide()) {
+            DissipationUtil.dissipate(world.random.nextInt() % 17 == 0 && tile.workTime < 0,
+                    tile, world, pPos);
+
+            BufferUtil.getEssenceFromBuffersBelow(tile, List.of(EssenceTypeRegistry.ESSENCE.get(), EssenceTypeRegistry.LUNAR_ESSENCE.get(), EssenceTypeRegistry.NATURAL_ESSENCE.get(), EssenceTypeRegistry.EXOTIC_ESSENCE.get()));
+            BufferUtil.getItemsFromBuffersBelow(tile, tile.itemHandler);
+            tile.item = tile.itemHandler.getStackInSlot(0);
             boolean shouldReset = true;
-            if (pBlockEntity.recipe != null) {
+            if (tile.recipe != null) {
                 boolean enoughEssence = true;
-                for (Map.Entry<ResourceLocation, Float> i : pBlockEntity.essenceCost.entrySet()) {
+                for (Map.Entry<ResourceLocation, Float> i : tile.essenceCost.entrySet()) {
                     EssenceType type = DataNEssenceRegistries.ESSENCE_TYPE_REGISTRY.get(i.getKey());
-                    if (pBlockEntity.storage.getEssence(type) < i.getValue()/50f) {
+                    if (tile.storage.getEssence(type) < i.getValue()/50f) {
                         enoughEssence = false;
                     }
                 }
                 if (enoughEssence) {
-                    Entry entry = DataDrive.getEntry(pBlockEntity.dataDriveHandler.getStackInSlot(0));
+                    Entry entry = DataDrive.getEntry(tile.dataDriveHandler.getStackInSlot(0));
                     if (entry != null) {
-                        if (pBlockEntity.dataDriveHandler.getStackInSlot(0).has(DataComponentRegistry.DATA_ID) && pBlockEntity.dataDriveHandler.getStackInSlot(0).has(DataComponentRegistry.DATA_INCOMPLETE)) {
-                            if (pBlockEntity.recipe == null || (pBlockEntity.recipe.getEntry().equals(entry.id) && DataDrive.getEntryCompletionStage(pBlockEntity.dataDriveHandler.getStackInSlot(0)) >= pBlockEntity.recipe.getCompletionStage())) {
-                                if (hasNotReachedStackLimit(pBlockEntity, pBlockEntity.recipe.getResultItem(pLevel.registryAccess()))) {
-                                    for (Map.Entry<ResourceLocation, Float> i : pBlockEntity.essenceCost.entrySet()) {
+                        if (tile.dataDriveHandler.getStackInSlot(0).has(DataComponentRegistry.DATA_ID) && tile.dataDriveHandler.getStackInSlot(0).has(DataComponentRegistry.DATA_INCOMPLETE)) {
+                            if (tile.recipe == null || (tile.recipe.getEntry().equals(entry.id) && DataDrive.getEntryCompletionStage(tile.dataDriveHandler.getStackInSlot(0)) >= tile.recipe.getCompletionStage())) {
+                                if (hasNotReachedStackLimit(tile, tile.recipe.getResultItem(world.registryAccess()))) {
+                                    for (Map.Entry<ResourceLocation, Float> i : tile.essenceCost.entrySet()) {
                                         EssenceType type = DataNEssenceRegistries.ESSENCE_TYPE_REGISTRY.get(i.getKey());
-                                        pBlockEntity.storage.removeEssence(type, i.getValue() / 50f);
+                                        tile.storage.removeEssence(type, i.getValue() / 50f);
                                     }
-                                    if (pBlockEntity.workTime >= 50) {
-                                        ItemStack stack = pBlockEntity.recipe.assemble(pBlockEntity.getCraftingInv(), pLevel.registryAccess()).copy();
-                                        pBlockEntity.outputItemHandler.insertItem(0, stack, false);
-                                        pBlockEntity.itemHandler.extractItem(0, 1, false);
-                                        pLevel.playSound(null, pPos, SoundRegistry.INFUSER_CRAFT.value(), SoundSource.BLOCKS, 2, 1);
-                                        pBlockEntity.workTime = 0;
+                                    if (tile.workTime >= 50) {
+                                        ItemStack stack = tile.recipe.assemble(tile.getCraftingInv(), world.registryAccess()).copy();
+                                        tile.outputItemHandler.insertItem(0, stack, false);
+                                        tile.itemHandler.extractItem(0, 1, false);
+                                        world.playSound(null, pPos, SoundRegistry.INFUSER_CRAFT.value(), SoundSource.BLOCKS, 2, 1);
+                                        tile.workTime = 0;
                                     } else {
-                                        pBlockEntity.workTime++;
+                                        tile.workTime++;
                                     }
                                     shouldReset = false;
                                 }
@@ -250,17 +257,17 @@ public class InfuserBlockEntity extends BlockEntity implements MenuProvider, Ess
                         }
                     }
                 }
-                pBlockEntity.enoughEssence = enoughEssence;
+                tile.enoughEssence = enoughEssence;
             }
             if (shouldReset) {
-                pBlockEntity.workTime = -1;
+                tile.workTime = -1;
             }
-            pBlockEntity.updateBlock();
+            tile.updateBlock();
         } else {
-            if (pBlockEntity.workTime >= 0) {
-                if (pBlockEntity.essenceCost != null) {
+            if (tile.workTime >= 0) {
+                if (tile.essenceCost != null) {
                     List<EssenceType> essences = new ArrayList<>();
-                    for (Map.Entry<ResourceLocation, Float> i : pBlockEntity.essenceCost.entrySet()) {
+                    for (Map.Entry<ResourceLocation, Float> i : tile.essenceCost.entrySet()) {
                         if (i.getValue() > 0) {
                             EssenceType type = DataNEssenceRegistries.ESSENCE_TYPE_REGISTRY.get(i.getKey());
                             essences.add(type);
@@ -271,14 +278,14 @@ public class InfuserBlockEntity extends BlockEntity implements MenuProvider, Ess
                             ConfigurableParticleOptions options = new CircleParticleOptions().setFriction(0.8f).setColor(new Color(essences.getFirst().color)).setAdditive(false).setFullbright(true);
                             Vec3 pos = pPos.getBottomCenter();
                             Vec3 spd = pos.vectorTo(pPos.getCenter()).scale(0.2);
-                            pLevel.addParticle(options, pos.x, pos.y, pos.z, spd.x, spd.y, spd.z);
+                            world.addParticle(options, pos.x, pos.y, pos.z, spd.x, spd.y, spd.z);
                         } else {
                             float rot = 45;
                             for (EssenceType i : essences) {
                                 ConfigurableParticleOptions options = new CircleParticleOptions().setFriction(0.8f).setColor(new Color(i.color)).setAdditive(false).setFullbright(true);
                                 Vec3 pos = pPos.getBottomCenter().add(Vec3.directionFromRotation(0, rot).scale(0.4));
                                 Vec3 spd = pos.vectorTo(pPos.getCenter()).scale(0.2);
-                                pLevel.addParticle(options, pos.x, pos.y, pos.z, spd.x, spd.y, spd.z);
+                                world.addParticle(options, pos.x, pos.y, pos.z, spd.x, spd.y, spd.z);
                                 rot += 360f / essences.size();
                             }
                         }

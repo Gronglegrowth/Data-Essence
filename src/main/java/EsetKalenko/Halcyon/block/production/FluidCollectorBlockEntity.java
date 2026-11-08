@@ -3,6 +3,7 @@ package EsetKalenko.Halcyon.block.production;
 import EsetKalenko.Halcyon.api.essence.EssenceBlockEntity;
 import EsetKalenko.Halcyon.api.essence.EssenceStorage;
 import EsetKalenko.Halcyon.api.essence.container.SingleEssenceContainer;
+import EsetKalenko.Halcyon.api.util.DissipationUtil;
 import EsetKalenko.Halcyon.registry.BlockEntityRegistry;
 import EsetKalenko.Halcyon.registry.EssenceTypeRegistry;
 import EsetKalenko.Halcyon.registry.SoundRegistry;
@@ -50,19 +51,23 @@ public class FluidCollectorBlockEntity extends BlockEntity implements EssenceBlo
         storage.fromNbt(nbt.getCompound("EssenceStorage"));
         cooldown = nbt.getInt("cooldown");
     }
-    public static void tick(Level pLevel, BlockPos pPos, BlockState pState, FluidCollectorBlockEntity pBlockEntity) {
+    public static void tick(Level world, BlockPos pPos, BlockState pState, FluidCollectorBlockEntity pBlockEntity) {
 
-        if (!pLevel.isClientSide()) {
+        if (!world.isClientSide()) {
+
+            DissipationUtil.dissipate(world.random.nextInt() % 17 == 0,
+                    pBlockEntity, world, pPos);
+
             if (pBlockEntity.cooldown <= 0) {
                 if (pBlockEntity.getStorage().getEssence(EssenceTypeRegistry.ESSENCE.get()) >= 25) {
                     BlockPos pos = pPos.relative(pState.getValue(FluidCollector.FACING));
-                    FluidState state = pLevel.getFluidState(pos);
+                    FluidState state = world.getFluidState(pos);
                     if (!state.isEmpty() && state.isSource()) {
                         FluidStack stack = new FluidStack(state.getType(), 1000);
                         if (pBlockEntity.fluidHandler.fill(stack, IFluidHandler.FluidAction.SIMULATE) > 0) {
                             pBlockEntity.fluidHandler.fill(stack, IFluidHandler.FluidAction.EXECUTE);
-                            pLevel.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
-                            pLevel.playSound(null, pPos, SoundRegistry.FLUID_COLLECTOR_FILL.value(), SoundSource.BLOCKS, 2f, 1f);
+                            world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
+                            world.playSound(null, pPos, SoundRegistry.FLUID_COLLECTOR_FILL.value(), SoundSource.BLOCKS, 2f, 1f);
                             pBlockEntity.getStorage().removeEssence(EssenceTypeRegistry.ESSENCE.get(), 25);
                             pBlockEntity.cooldown = 20;
                         }

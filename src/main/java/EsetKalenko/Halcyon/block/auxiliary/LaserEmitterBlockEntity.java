@@ -5,6 +5,8 @@ import EsetKalenko.Halcyon.api.essence.EssenceStorage;
 import EsetKalenko.Halcyon.api.essence.container.SingleEssenceContainer;
 import EsetKalenko.Halcyon.api.util.BufferUtil;
 import EsetKalenko.Halcyon.api.item.ILaserEmitterModule;
+import EsetKalenko.Halcyon.api.util.DissipationUtil;
+import EsetKalenko.Halcyon.networking.packet.s2c.vfx.PlayDissipationFXSingleBlock;
 import EsetKalenko.Halcyon.registry.BlockEntityRegistry;
 import EsetKalenko.Halcyon.registry.EssenceTypeRegistry;
 import EsetKalenko.Halcyon.screen.LaserEmitterMenu;
@@ -14,6 +16,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.SimpleContainer;
@@ -30,9 +33,11 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import net.neoforged.neoforge.items.wrapper.CombinedInvWrapper;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.awt.*;
 import java.util.List;
 
 public class LaserEmitterBlockEntity extends BlockEntity implements MenuProvider, EssenceBlockEntity {
@@ -115,6 +120,9 @@ public class LaserEmitterBlockEntity extends BlockEntity implements MenuProvider
         if (!(pBlockEntity.itemHandler.getStackInSlot(0).getItem() instanceof ILaserEmitterModule)) {
             drainsEssence = false;
         }
+
+        DissipationUtil.dissipate(pLevel.random.nextInt() % 17 == 0 && !drainsEssence,
+                pBlockEntity, pLevel, pPos);
 
         if (!pLevel.isClientSide) {
             BufferUtil.getEssenceFromBuffersBelow(pBlockEntity, EssenceTypeRegistry.ESSENCE.get());

@@ -3,6 +3,7 @@ package EsetKalenko.Halcyon.block.production;
 import EsetKalenko.Halcyon.api.essence.EssenceBlockEntity;
 import EsetKalenko.Halcyon.api.essence.EssenceStorage;
 import EsetKalenko.Halcyon.api.essence.container.SingleEssenceContainer;
+import EsetKalenko.Halcyon.api.util.DissipationUtil;
 import EsetKalenko.Halcyon.registry.BlockEntityRegistry;
 import EsetKalenko.Halcyon.registry.EssenceTypeRegistry;
 import EsetKalenko.Halcyon.registry.HalcyonTags;
@@ -71,6 +72,10 @@ public class CrystallineCradleBlockEntity extends BlockEntity implements Essence
 
     public static void tick(Level world, BlockPos pos, BlockState state, CrystallineCradleBlockEntity tile) {
         if (!world.isClientSide()) {
+
+            DissipationUtil.dissipate(world.random.nextInt() % 17 == 0,
+                    tile, world, pos);
+
             if (!world.hasNeighborSignal(pos)) {
                 if (tile.interval <= 0) {
                     tile.destroyTicks = 0;

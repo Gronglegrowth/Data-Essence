@@ -8,6 +8,7 @@ import EsetKalenko.Halcyon.api.essence.EssenceType;
 import EsetKalenko.Halcyon.api.essence.container.MultiEssenceContainer;
 import EsetKalenko.Halcyon.api.util.BufferUtil;
 import EsetKalenko.Halcyon.api.misc.ILockableContainer;
+import EsetKalenko.Halcyon.api.util.DissipationUtil;
 import EsetKalenko.Halcyon.client.FactorySong;
 import EsetKalenko.Halcyon.item.DataDrive;
 import EsetKalenko.Halcyon.api.LockableItemHandler;
@@ -231,8 +232,11 @@ public class SynthesisChamberBlockEntity extends BlockEntity implements MenuProv
     public Map<ResourceLocation, Float> essenceCost;
     public int workTime;
     public int maxWorkTime;
-    public static void tick(Level pLevel, BlockPos pPos, BlockState pState, SynthesisChamberBlockEntity synthesisChamber) {
-        if (!pLevel.isClientSide()) {
+    public static void tick(Level world, BlockPos pos, BlockState pState, SynthesisChamberBlockEntity synthesisChamber) {
+        if (!world.isClientSide()) {
+            DissipationUtil.dissipate(world.random.nextInt() % 17 == 0 && synthesisChamber.workTime < 0,
+                    synthesisChamber, world, pos);
+
             BufferUtil.getEssenceFromBuffersBelow(synthesisChamber, List.of(EssenceTypeRegistry.ESSENCE.get(), EssenceTypeRegistry.LUNAR_ESSENCE.get(), EssenceTypeRegistry.NATURAL_ESSENCE.get(), EssenceTypeRegistry.EXOTIC_ESSENCE.get()));
 
             for ( var lockedSlot : synthesisChamber.getLockable() ) {
@@ -253,7 +257,7 @@ public class SynthesisChamberBlockEntity extends BlockEntity implements MenuProv
                 }
                 synthesisChamber.enoughEssence = enoughEssence;
                 if (enoughEssence) {
-                    ItemStack result = synthesisChamber.recipe.getResultItem(pLevel.registryAccess());
+                    ItemStack result = synthesisChamber.recipe.getResultItem(world.registryAccess());
                     if (synthesisChamber.outputItemHandler.insertItem(0, result, true).isEmpty()) {
                         resetWorkTime = false;
                         synthesisChamber.workTime++;
@@ -262,7 +266,7 @@ public class SynthesisChamberBlockEntity extends BlockEntity implements MenuProv
                             synthesisChamber.storage.removeEssence(type, i.getValue()/synthesisChamber.recipe.getTime());
                         }
                         if (synthesisChamber.workTime >= synthesisChamber.recipe.getTime()) {
-                            synthesisChamber.outputItemHandler.insertItem(0, synthesisChamber.recipe.assemble(synthesisChamber.getCraftingInv(), pLevel.registryAccess()), false);
+                            synthesisChamber.outputItemHandler.insertItem(0, synthesisChamber.recipe.assemble(synthesisChamber.getCraftingInv(), world.registryAccess()), false);
                             synthesisChamber.itemHandler.extractItem(0, 1, false);
                             synthesisChamber.itemHandler.extractItem(1, 1, false);
                             synthesisChamber.workTime = 0;
@@ -277,9 +281,9 @@ public class SynthesisChamberBlockEntity extends BlockEntity implements MenuProv
         } else {
             if (synthesisChamber.workTime >= 0 && synthesisChamber.essenceCost != null && synthesisChamber.itemHandler.locked) {
                 if ( synthesisChamber.essenceCost.containsKey(DataNEssenceRegistries.ESSENCE_TYPE_REGISTRY.getKey(EssenceTypeRegistry.ESSENCE.get())) )
-                    ClientHandler.markIndustrialFactorySong(pPos);
+                    ClientHandler.markIndustrialFactorySong(pos);
                 if ( synthesisChamber.essenceCost.containsKey(DataNEssenceRegistries.ESSENCE_TYPE_REGISTRY.getKey(EssenceTypeRegistry.LUNAR_ESSENCE.get())) )
-                    ClientHandler.markLunarFactorySong(pPos);
+                    ClientHandler.markLunarFactorySong(pos);
             }
         }
     }

@@ -5,6 +5,8 @@ import EsetKalenko.Halcyon.api.essence.EssenceBlockEntity;
 import EsetKalenko.Halcyon.api.essence.EssenceStorage;
 import EsetKalenko.Halcyon.api.essence.container.SingleEssenceContainer;
 import EsetKalenko.Halcyon.api.util.BufferUtil;
+import EsetKalenko.Halcyon.api.util.DissipationUtil;
+import EsetKalenko.Halcyon.networking.packet.s2c.vfx.PlayDissipationFXSingleBlock;
 import EsetKalenko.Halcyon.registry.BlockEntityRegistry;
 import EsetKalenko.Halcyon.registry.EssenceTypeRegistry;
 import EsetKalenko.Halcyon.screen.FluidBottlerMenu;
@@ -15,6 +17,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Containers;
@@ -39,9 +42,11 @@ import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import net.neoforged.neoforge.items.wrapper.CombinedInvWrapper;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.awt.*;
 import java.util.List;
 
 public class FluidBottlerBlockEntity extends BlockEntity implements MenuProvider, EssenceBlockEntity, Machine {
@@ -146,6 +151,10 @@ public class FluidBottlerBlockEntity extends BlockEntity implements MenuProvider
     public int workTime;
     public static void tick(Level pLevel, BlockPos pPos, BlockState pState, FluidBottlerBlockEntity pBlockEntity) {
         if (!pLevel.isClientSide()) {
+
+            DissipationUtil.dissipate(pLevel.random.nextInt() % 17 == 0 && pBlockEntity.workTime < 0,
+                    pBlockEntity, pLevel, pPos);
+
             BufferUtil.getEssenceFromBuffersBelow(pBlockEntity, EssenceTypeRegistry.ESSENCE.get());
             BufferUtil.getItemsFromBuffersBelow(pBlockEntity, pBlockEntity.itemHandler);
             BufferUtil.getFluidsFromBuffersBelow(pBlockEntity, pBlockEntity.fluidHandler);

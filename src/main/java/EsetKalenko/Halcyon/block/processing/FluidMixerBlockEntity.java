@@ -1,5 +1,7 @@
 package EsetKalenko.Halcyon.block.processing;
 
+import EsetKalenko.Halcyon.api.util.DissipationUtil;
+import EsetKalenko.Halcyon.networking.packet.s2c.vfx.PlayDissipationFXSingleBlock;
 import com.cmdpro.databank.model.animation.DatabankAnimationReference;
 import com.cmdpro.databank.model.animation.DatabankAnimationState;
 import EsetKalenko.Halcyon.api.block.Machine;
@@ -23,6 +25,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.SimpleContainer;
@@ -42,9 +45,11 @@ import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import net.neoforged.neoforge.items.wrapper.CombinedInvWrapper;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -233,45 +238,48 @@ public class FluidMixerBlockEntity extends BlockEntity implements MenuProvider, 
         }
     }
 
-    public static void tick(Level pLevel, BlockPos pPos, BlockState pState, FluidMixerBlockEntity pBlockEntity) {
-        pBlockEntity.age++;
+    public static void tick(Level world, BlockPos pos, BlockState pState, FluidMixerBlockEntity tile) {
+        tile.age++;
 
-        if (!pLevel.isClientSide()) {
-            BufferUtil.getEssenceFromBuffersBelow(pBlockEntity, EssenceTypeRegistry.ESSENCE.get());
-            BufferUtil.getItemsFromBuffersBelow(pBlockEntity, pBlockEntity.itemHandler);
-            BufferUtil.getFluidsFromBuffersBelow(pBlockEntity, pBlockEntity.fluidHandler);
+        if (!world.isClientSide()) {
+            DissipationUtil.dissipate(world.random.nextInt() % 17 == 0 && tile.workTime < 0,
+                    tile, world, pos);
+
+            BufferUtil.getEssenceFromBuffersBelow(tile, EssenceTypeRegistry.ESSENCE.get());
+            BufferUtil.getItemsFromBuffersBelow(tile, tile.itemHandler);
+            BufferUtil.getFluidsFromBuffersBelow(tile, tile.fluidHandler);
             boolean resetWorkTime = true;
-            if (pBlockEntity.recipe != null) {
+            if (tile.recipe != null) {
                 boolean enoughEssence = false;
-                if (pBlockEntity.getStorage().getEssence(EssenceTypeRegistry.ESSENCE.get()) >= pBlockEntity.essenceCost/pBlockEntity.recipe.getTime()) {
+                if (tile.getStorage().getEssence(EssenceTypeRegistry.ESSENCE.get()) >= tile.essenceCost/tile.recipe.getTime()) {
                     enoughEssence = true;
                 }
-                pBlockEntity.enoughEssence = enoughEssence;
+                tile.enoughEssence = enoughEssence;
                 if (enoughEssence) {
-                    FluidStack result = pBlockEntity.recipe.getOutput();
-                    if (pBlockEntity.outputFluidHandler.fill(result, IFluidHandler.FluidAction.SIMULATE) >= result.getAmount()) {
+                    FluidStack result = tile.recipe.getOutput();
+                    if (tile.outputFluidHandler.fill(result, IFluidHandler.FluidAction.SIMULATE) >= result.getAmount()) {
                         resetWorkTime = false;
-                        pBlockEntity.workTime++;
-                        pBlockEntity.getStorage().removeEssence(EssenceTypeRegistry.ESSENCE.get(), pBlockEntity.essenceCost/pBlockEntity.recipe.getTime());
-                        if (pBlockEntity.workTime >= pBlockEntity.recipe.getTime()) {
-                            FluidStack input1 = pBlockEntity.recipe.getInput1();
-                            FluidStack input2 = pBlockEntity.recipe.getInput2();
-                            pBlockEntity.outputFluidHandler.fill(result, IFluidHandler.FluidAction.EXECUTE);
-                            pBlockEntity.itemHandler.extractItem(0, 1, false);
-                            pBlockEntity.fluidHandler.drain(input1, IFluidHandler.FluidAction.EXECUTE);
-                            pBlockEntity.fluidHandler.drain(input2, IFluidHandler.FluidAction.EXECUTE);
-                            pBlockEntity.workTime = 0;
+                        tile.workTime++;
+                        tile.getStorage().removeEssence(EssenceTypeRegistry.ESSENCE.get(), tile.essenceCost/tile.recipe.getTime());
+                        if (tile.workTime >= tile.recipe.getTime()) {
+                            FluidStack input1 = tile.recipe.getInput1();
+                            FluidStack input2 = tile.recipe.getInput2();
+                            tile.outputFluidHandler.fill(result, IFluidHandler.FluidAction.EXECUTE);
+                            tile.itemHandler.extractItem(0, 1, false);
+                            tile.fluidHandler.drain(input1, IFluidHandler.FluidAction.EXECUTE);
+                            tile.fluidHandler.drain(input2, IFluidHandler.FluidAction.EXECUTE);
+                            tile.workTime = 0;
                         }
                     }
                 }
             }
             if (resetWorkTime) {
-                pBlockEntity.workTime = -1;
+                tile.workTime = -1;
             }
-            pBlockEntity.updateBlock();
+            tile.updateBlock();
         } else {
-            Optional<RecipeHolder<FluidMixingRecipe>> recipe = pLevel.getRecipeManager().getRecipeFor(RecipeRegistry.FLUID_MIXING_TYPE.get(), pBlockEntity.getCraftingInv(), pLevel);
-            recipe.ifPresentOrElse(recipeHolder -> pBlockEntity.recipe = recipeHolder.value(), () -> pBlockEntity.recipe = null);
+            Optional<RecipeHolder<FluidMixingRecipe>> recipe = world.getRecipeManager().getRecipeFor(RecipeRegistry.FLUID_MIXING_TYPE.get(), tile.getCraftingInv(), world);
+            recipe.ifPresentOrElse(recipeHolder -> tile.recipe = recipeHolder.value(), () -> tile.recipe = null);
         }
     }
 

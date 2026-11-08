@@ -5,6 +5,7 @@ import EsetKalenko.Halcyon.api.essence.EssenceBlockEntity;
 import EsetKalenko.Halcyon.api.essence.EssenceStorage;
 import EsetKalenko.Halcyon.api.essence.container.SingleEssenceContainer;
 import EsetKalenko.Halcyon.api.util.BufferUtil;
+import EsetKalenko.Halcyon.api.util.DissipationUtil;
 import EsetKalenko.Halcyon.recipe.MineralPurificationRecipe;
 import EsetKalenko.Halcyon.registry.BlockEntityRegistry;
 import EsetKalenko.Halcyon.registry.EssenceTypeRegistry;
@@ -174,16 +175,19 @@ public class MineralPurificationChamberBlockEntity extends BlockEntity implement
     public int workTime;
     public MineralPurificationRecipe recipe;
     public float essenceCost;
-    public static void tick(Level pLevel, BlockPos pPos, BlockState pState, MineralPurificationChamberBlockEntity pBlockEntity) {
-        if (!pLevel.isClientSide()) {
+    public static void tick(Level world, BlockPos pos, BlockState pState, MineralPurificationChamberBlockEntity pBlockEntity) {
+        if (!world.isClientSide()) {
+            DissipationUtil.dissipate(world.random.nextInt() % 17 == 0 && pBlockEntity.workTime < 0,
+                    pBlockEntity, world, pos);
+
             BufferUtil.getEssenceFromBuffersBelow(pBlockEntity, EssenceTypeRegistry.ESSENCE.get());
             BufferUtil.getItemsFromBuffersBelow(pBlockEntity, pBlockEntity.itemHandler);
             BufferUtil.getFluidsFromBuffersBelow(pBlockEntity, pBlockEntity.waterFluidHandler);
             boolean resetWorkTime = true;
             if (pBlockEntity.getStorage().getEssence(EssenceTypeRegistry.ESSENCE.get()) >= 1 && pBlockEntity.waterFluidHandler.getFluidAmount() >= 250) {
                 if (pBlockEntity.recipe != null) {
-                    ItemStack assembled = pBlockEntity.recipe.assemble(pBlockEntity.getCraftingInv(), pLevel.registryAccess());
-                    ItemStack assembled2 = pBlockEntity.recipe.assembleNuggetOutput(pLevel.random, pBlockEntity.getCraftingInv(), pLevel.registryAccess());
+                    ItemStack assembled = pBlockEntity.recipe.assemble(pBlockEntity.getCraftingInv(), world.registryAccess());
+                    ItemStack assembled2 = pBlockEntity.recipe.assembleNuggetOutput(world.random, pBlockEntity.getCraftingInv(), world.registryAccess());
                     if (pBlockEntity.outputItemHandler.insertItem(0, assembled, true).isEmpty() && pBlockEntity.outputItemHandler.insertItem(1, assembled2, true).isEmpty()) {
                         resetWorkTime = false;
                         pBlockEntity.workTime++;
@@ -193,7 +197,7 @@ public class MineralPurificationChamberBlockEntity extends BlockEntity implement
                             pBlockEntity.outputItemHandler.insertItem(0, assembled, false);
                             pBlockEntity.outputItemHandler.insertItem(1, assembled2, false);
                             pBlockEntity.itemHandler.extractItem(0, 1, false);
-                            pLevel.playSound(null, pPos, SoundRegistry.MINERAL_PURIFICATION_CHAMBER_CRAFT.value(), SoundSource.BLOCKS, 1, 1);
+                            world.playSound(null, pos, SoundRegistry.MINERAL_PURIFICATION_CHAMBER_CRAFT.value(), SoundSource.BLOCKS, 1, 1);
                             pBlockEntity.workTime = 0;
                         }
                     }
