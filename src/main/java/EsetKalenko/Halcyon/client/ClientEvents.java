@@ -14,7 +14,7 @@ import EsetKalenko.Halcyon.api.pearlnetwork.PearlNetworkBlockEntity;
 import EsetKalenko.Halcyon.api.util.client.ClientEssenceBarUtil;
 import EsetKalenko.Halcyon.api.util.client.ClientRenderingUtil;
 import EsetKalenko.Halcyon.block.auxiliary.ChargerBlockEntity;
-import EsetKalenko.Halcyon.block.auxiliary.EssenceReaderBlockEntity;
+import EsetKalenko.Halcyon.block.control.EssenceReaderBlockEntity;
 import EsetKalenko.Halcyon.client.gui.PingsGuiLayer;
 import EsetKalenko.Halcyon.client.particle.CircleParticleOptions;
 import EsetKalenko.Halcyon.config.DataNEssenceClientConfig;
@@ -72,7 +72,6 @@ import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import org.apache.commons.lang3.RandomUtils;
 import org.joml.Math;
-import org.joml.Vector3d;
 
 import java.awt.*;
 import java.text.DecimalFormat;

@@ -1,5 +1,6 @@
 package EsetKalenko.Halcyon.block.auxiliary;
 
+import EsetKalenko.Halcyon.api.block.RedstoneMonitorable;
 import com.cmdpro.databank.model.animation.DatabankAnimationReference;
 import com.cmdpro.databank.model.animation.DatabankAnimationState;
 import EsetKalenko.Halcyon.api.DataNEssenceRegistries;
@@ -33,7 +34,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public class ChargerBlockEntity extends BlockEntity implements EssenceBlockEntity {
+public class ChargerBlockEntity extends BlockEntity implements EssenceBlockEntity, RedstoneMonitorable {
     public DatabankAnimationState animState = new DatabankAnimationState("idle_empty")
             .addAnim(new DatabankAnimationReference("idle_empty", (state, anim) -> {}, (state, anim) -> {}))
             .addAnim(new DatabankAnimationReference("orb_spin", (state, anim) -> {}, (state, anim) -> {}))
@@ -82,19 +83,23 @@ public class ChargerBlockEntity extends BlockEntity implements EssenceBlockEntit
     public ClientboundBlockEntityDataPacket getUpdatePacket(){
         return ClientboundBlockEntityDataPacket.create(this);
     }
+
     @Override
     public void onDataPacket(Connection connection, ClientboundBlockEntityDataPacket pkt, HolderLookup.Provider pRegistries){
         CompoundTag tag = pkt.getTag();
         storage.fromNbt(tag.getCompound("EssenceStorage"));
         item = ItemStack.parseOptional(pRegistries, tag.getCompound("item"));
         charging = tag.getBoolean("charging");
+        canCharge = tag.getBoolean("canCharge");
     }
+
     @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider pRegistries) {
         CompoundTag tag = new CompoundTag();
         tag.put("EssenceStorage", storage.toNbt());
         tag.put("item", item.saveOptional(pRegistries));
         tag.putBoolean("charging", charging);
+        tag.putBoolean("canCharge", canCharge);
         return tag;
     }
 
@@ -123,9 +128,11 @@ public class ChargerBlockEntity extends BlockEntity implements EssenceBlockEntit
     public float naturalEssenceCost;
     public float exoticEssenceCost;
     public boolean charging;
+    public boolean canCharge;
     public static void tick(Level pLevel, BlockPos pPos, BlockState pState, ChargerBlockEntity pBlockEntity) {
         if (!pLevel.isClientSide()) {
             pBlockEntity.charging = false;
+            pBlockEntity.canCharge = false;
             BufferUtil.getEssenceFromBuffersBelow(pBlockEntity, List.of(EssenceTypeRegistry.ESSENCE.get(), EssenceTypeRegistry.LUNAR_ESSENCE.get(), EssenceTypeRegistry.NATURAL_ESSENCE.get(), EssenceTypeRegistry.EXOTIC_ESSENCE.get()));
             ItemStack stack = pBlockEntity.itemHandler.getStackInSlot(0).copy();
             pBlockEntity.item = stack;
@@ -136,6 +143,7 @@ public class ChargerBlockEntity extends BlockEntity implements EssenceBlockEntit
                     float essence = ItemEssenceContainer.getEssence(stack, essenceType);
                     if (essence < maxEssence) {
                         float fill = Math.min(maxEssence - essence, Math.min(5f, pBlockEntity.getStorage().getEssence(i)));
+                        pBlockEntity.canCharge = true;
                         if (fill > 0) {
                             ItemEssenceContainer.addEssence(stack, essenceType, fill);
                             pBlockEntity.getStorage().removeEssence(i, fill);
@@ -222,5 +230,10 @@ public class ChargerBlockEntity extends BlockEntity implements EssenceBlockEntit
             }
         }
         return EssenceBlockEntity.super.getMeterSideLength(direction);
+    }
+
+    @Override
+    public boolean hasWork() {
+        return canCharge;
     }
 }

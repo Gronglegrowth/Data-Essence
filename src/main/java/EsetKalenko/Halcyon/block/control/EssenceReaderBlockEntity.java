@@ -1,4 +1,4 @@
-package EsetKalenko.Halcyon.block.auxiliary;
+package EsetKalenko.Halcyon.block.control;
 
 import EsetKalenko.Halcyon.datamaps.HalcyonDatamaps;
 import com.cmdpro.databank.rendering.ColorUtil;
@@ -28,7 +28,6 @@ import org.jetbrains.annotations.NotNull;
 import java.awt.*;
 import java.util.*;
 import java.util.List;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class EssenceReaderBlockEntity extends BlockEntity {

@@ -441,6 +441,7 @@ public class Halcyon
 
             // Redstone Components
             event.accept(BlockRegistry.ESSENCE_READER.get());
+            event.accept(BlockRegistry.OVERSEEING_SPIKE.get());
 
             // Storage Blocks
             event.accept(BlockRegistry.ESSENCE_BATTERY.get());

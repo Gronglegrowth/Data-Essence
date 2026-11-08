@@ -246,6 +246,7 @@
   "block.halcyon.natural_essence_battery.amount": " ◇ Battery holds %1$s/%2$s Living Tidal Energy.",
   "block.halcyon.natural_essence_point": "Living Node",
   "block.halcyon.obsidian_framed_glass": "Obsidian-Framed Glass",
+  "block.halcyon.overseeing_spike": "Overseeing Spike",
   "block.halcyon.patterned_copper": "Patterned Copper",
   "block.halcyon.polished_obsidian": "Polished Obsidian",
   "block.halcyon.polished_obsidian_bricks": "Polished Obsidian Bricks",
@@ -518,6 +519,8 @@
   "data_tablet.pages.lunar_energy_transfer.name": "Transferring Lunar Tidal Energy",
   "data_tablet.pages.lunar_energy_transfer.page1.incomplete_text": "In theory it should be a simple matter to adapt our existing Industrial Nodes to transfer the energy of this new Lunar Tide. In practice, copper serves an incredibly poor conductor here, and so it takes much more effort to coax the metal to our will. However, we suspect we'll need to be able to transfer Lunar to acquire a better node material.... Sometimes, one must be inefficient to be efficient.",
   "data_tablet.pages.lunar_energy_transfer.page1.text": "As we have Wires and Nodes for Industrial Tidal Energy, the same basic design carries over to Lunar, as well. However, instead of copper for the nodes, they instead must be plated with Ecliptrum. The wires, curiously, work satisfactorily as-is, though of course needing a different coating material.",
+  "data_tablet.pages.redstone_energy_devices.name": "Manipulating Tidal Energy with Redstone",
+  "data_tablet.pages.redstone_energy_devices.page1.text": "Given how Tidal Energy behaves, it is imperative to make constructions that automatically respond to the state thereof in our machines. These simple redstone components will assist in that.\n\nThe <name tbd> must be affixed to the side of a machine. It will then monitor that machine, emitting a signal out its other end when the machine has work -- that is, in most cases, merely actively using Tidal Energy.",
 
   "_comment.data_tablet.pages.integration": "Mod Integration category texts.",
   "data_tablet.pages.integration_ae2.name": "Integration: Applied Energistics 2",
@@ -549,7 +552,7 @@
   "data_tablet.pages.integration_malum.page2.text": "As we can create normal Charcoal in an Infuser more efficiently, so too can we create its Arcane counterpart. A rather simple effort, but perhaps useful before one procures a Tidal Furnace.",
   "data_tablet.pages.integration_malum_lunar.name": "Malum: Transformative Innovations",
   "data_tablet.pages.integration_malum_lunar.page1.incomplete_text": "We may have stumbled upon a new innovation with the Lunar Tide and spirit arcana. But we simply do not - can not - know enough to fully derive its nature. Perhaps we need knowledge from an outside source? But whom, or what? The Phenuans surely would not dare to instruct us now.",
-  "data_tablet.pages.integration_malum_lunar.page1.text": "All five of our suqadron have now dove into that Well, that pit, that expanse. The information we have gained - after an indescribable experience - has been sufficient for our needs: the Lunar Tide allows us to transform some base components into Cthonic Gold, where previously this secret was barred from us.",
+  "data_tablet.pages.integration_malum_lunar.page1.text": "All five of our squadron have now dove into that Well, that pit, that expanse. The information we have gained - after an indescribable experience - has been sufficient for our needs: the Lunar Tide allows us to transform some base components into Cthonic Gold, where previously this secret was barred from us.",
 
   "_comment.data_tablet_pages.machinery": "Machinery and Processing (tiers 1 and 2) category texts.",
   "data_tablet.pages.advanced_filtering.name": "Advanced Filtering",

@@ -5,6 +5,8 @@ import EsetKalenko.Halcyon.api.block.SpreadingPlant;
 
 import EsetKalenko.Halcyon.block.DirectionalPillarBlock;
 import EsetKalenko.Halcyon.block.auxiliary.*;
+import EsetKalenko.Halcyon.block.control.EssenceReader;
+import EsetKalenko.Halcyon.block.control.OverseeingSpike;
 import EsetKalenko.Halcyon.block.decoration.*;
 import EsetKalenko.Halcyon.block.processing.*;
 import EsetKalenko.Halcyon.block.production.*;
@@ -42,7 +44,6 @@ import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
 import net.minecraft.world.level.material.MapColor;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
-import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -303,6 +304,9 @@ public class BlockRegistry {
     // Redstone Components
     public static final Supplier<Block> ESSENCE_READER = register("essence_reader",
             () -> new EssenceReader(getToollessMachineProperties().instabreak()),
+            object -> () -> new BlockItem(object.get(), new Item.Properties()));
+    public static final Supplier<Block> OVERSEEING_SPIKE = register("overseeing_spike",
+            () -> new OverseeingSpike(getToollessMachineProperties().instabreak().noCollission()),
             object -> () -> new BlockItem(object.get(), new Item.Properties()));
 
     // Storage

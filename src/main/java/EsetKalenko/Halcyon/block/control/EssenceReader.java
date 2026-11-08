@@ -1,4 +1,4 @@
-package EsetKalenko.Halcyon.block.auxiliary;
+package EsetKalenko.Halcyon.block.control;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -53,6 +53,7 @@ public class EssenceReader extends Block implements EntityBlock {
     public VoxelShape getShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
         return SHAPE;
     }
+
     @Override
     public RenderShape getRenderShape(BlockState pState) {
         return RenderShape.MODEL;
@@ -62,6 +63,7 @@ public class EssenceReader extends Block implements EntityBlock {
         super(pProperties);
         this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH));
     }
+
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pPos, BlockState pState) {

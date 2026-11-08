@@ -2,6 +2,8 @@ package EsetKalenko.Halcyon.registry;
 
 import EsetKalenko.Halcyon.Halcyon;
 import EsetKalenko.Halcyon.block.auxiliary.*;
+import EsetKalenko.Halcyon.block.control.EssenceReaderBlockEntity;
+import EsetKalenko.Halcyon.block.control.OverseeingSpikeBlockEntity;
 import EsetKalenko.Halcyon.block.processing.*;
 import EsetKalenko.Halcyon.block.production.*;
 import EsetKalenko.Halcyon.block.storage.*;
@@ -243,6 +245,10 @@ public class BlockEntityRegistry {
             register("essence_reader", () ->
                     BlockEntityType.Builder.of(EssenceReaderBlockEntity::new,
                             BlockRegistry.ESSENCE_READER.get()).build(null));
+    public static final Supplier<BlockEntityType<OverseeingSpikeBlockEntity>> OVERSEEING_SPIKE =
+            register("overseeing_spike", () ->
+                    BlockEntityType.Builder.of(OverseeingSpikeBlockEntity::new,
+                            BlockRegistry.OVERSEEING_SPIKE.get()).build(null));
     public static final Supplier<BlockEntityType<SurveyTunnelerBlockEntity>> SURVEY_TUNNELER =
             register("survey_tunneler", () ->
                     BlockEntityType.Builder.of(SurveyTunnelerBlockEntity::new,

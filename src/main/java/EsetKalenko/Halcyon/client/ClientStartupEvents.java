@@ -8,7 +8,7 @@ import EsetKalenko.Halcyon.api.item.ItemDecorators;
 import EsetKalenko.Halcyon.api.item.ItemEssenceContainer;
 import EsetKalenko.Halcyon.api.util.client.AnimatedBlockItemUtil;
 import EsetKalenko.Halcyon.client.dimension.SanctuarySpecialEffects;
-import EsetKalenko.Halcyon.block.auxiliary.EssenceReaderBlockEntity;
+import EsetKalenko.Halcyon.block.control.EssenceReaderBlockEntity;
 import EsetKalenko.Halcyon.client.gui.PingsGuiLayer;
 import EsetKalenko.Halcyon.client.renderers.entity.*;
 import EsetKalenko.Halcyon.client.shaders.MachineOutputShader;
