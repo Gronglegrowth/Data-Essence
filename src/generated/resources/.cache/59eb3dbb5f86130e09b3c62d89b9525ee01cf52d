@@ -1,4 +1,4 @@
-// 1.21.1	2026-06-19T22:34:43.970318298	Loot Tables
+// 1.21.1	2026-11-08T08:10:19.858420629	Loot Tables
 4328e53e506d08c6a97ca8fc16e059e34b0791f2 data/halcyon/loot_table/blocks/aether_rune.json
 d4af094530d4fce4f780230301ddde378ac00933 data/halcyon/loot_table/blocks/ancient_glyph_stone_blank.json
 4b03aeb207649970cd83fedb901b5d4aed0b8731 data/halcyon/loot_table/blocks/ancient_glyph_stone_blank_shieldless.json
@@ -102,6 +102,7 @@ efb3cf188caf707aeb438f9843044ca289a61442 data/halcyon/loot_table/blocks/metal_sh
 dd089af75d798f2dc3433419ecf223e8611b99fb data/halcyon/loot_table/blocks/natural_essence_battery.json
 0d00a2515228308b5887345c073402a00b722a10 data/halcyon/loot_table/blocks/natural_essence_point.json
 d6a82430d51963f2a9823494ff272eeae7082a43 data/halcyon/loot_table/blocks/obsidian_framed_glass.json
+c37de2b684c88783d59588c11916e5edfa9b9eea data/halcyon/loot_table/blocks/overseeing_spike.json
 f6da63ab66cb432276a0fff5c10d6e6e0ab34b1a data/halcyon/loot_table/blocks/patterned_copper.json
 a8ffb573f014f452965ee58170b189783bf571f8 data/halcyon/loot_table/blocks/player_data_bank.json
 66d723fb98ea28f3ebd39a18c797dbbec97bc9f1 data/halcyon/loot_table/blocks/polished_obsidian.json

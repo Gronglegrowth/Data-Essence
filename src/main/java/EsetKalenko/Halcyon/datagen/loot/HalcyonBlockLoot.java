@@ -143,6 +143,7 @@ public class HalcyonBlockLoot extends BlockLootSubProvider {
                 block -> noDrop());
         dropSelf(BlockRegistry.OBSIDIAN_FRAMED_GLASS.get());
         dropSelf(BlockRegistry.ESSENCE_READER.get());
+        dropSelf(BlockRegistry.OVERSEEING_SPIKE.get());
         dropSelf(BlockRegistry.SURVEY_TUNNELER.get());
         dropSelf(BlockRegistry.TWINING_LANTERN.get());
         dropSelf(BlockRegistry.MAKUTUIN_RUNNER.get());
