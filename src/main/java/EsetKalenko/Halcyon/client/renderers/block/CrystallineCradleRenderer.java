@@ -25,6 +25,8 @@ public class CrystallineCradleRenderer extends DatabankBlockEntityRenderer<Cryst
 
     @Override
     public void render(CrystallineCradleBlockEntity blockEntity, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
+        super.render(blockEntity, partialTick, poseStack, bufferSource, packedLight, packedOverlay);
+
         float u0 = 0;//sprite.getU0();
         float u1 = 1;//sprite.getU1();
         float v0 = 0;//sprite.getV0();
