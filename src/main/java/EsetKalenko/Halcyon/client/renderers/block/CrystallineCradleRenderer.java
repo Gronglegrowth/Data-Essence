@@ -56,11 +56,12 @@ public class CrystallineCradleRenderer extends DatabankBlockEntityRenderer<Cryst
         @Override
         public void setupModelPose(CrystallineCradleBlockEntity cradle, float partialTick) {
             cradle.animState.updateAnimDefinitions(getModel());
-            if ( cradle.interval <= 10
-                    && !cradle.animState.isCurrentAnim("hit_bell")) {
-                cradle.animState.setAnim("hit_bell");
-            }
-            animate(cradle.animState);
+            var state = cradle.animState;
+
+            // todo: "hit_bell" when 0.5s before breaking
+            state.setAnim("hit_bell");
+
+            animate(state);
         }
 
         @Override

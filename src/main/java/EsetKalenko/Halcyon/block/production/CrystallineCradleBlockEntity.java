@@ -63,12 +63,14 @@ public class CrystallineCradleBlockEntity extends BlockEntity implements Essence
     public void onDataPacket(Connection connection, ClientboundBlockEntityDataPacket pkt, HolderLookup.Provider pRegistries){
         CompoundTag tag = pkt.getTag();
         visualDestroyTicks = tag.getInt("destroyTicks");
+        interval = tag.getInt("BreakInterval");
     }
 
     @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider pRegistries) {
         CompoundTag tag = new CompoundTag();
         tag.putInt("destroyTicks", destroyTicks);
+        tag.putInt("BreakInterval", interval);
         return tag;
     }
 
