@@ -14,10 +14,17 @@ public class CrystallineCradle extends Block implements EntityBlock {
     public CrystallineCradle(Properties properties) {
         super(properties);
     }
+
+    @Override
+    public RenderShape getRenderShape(BlockState state) {
+        return RenderShape.ENTITYBLOCK_ANIMATED;
+    }
+
     @Override
     public @Nullable BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new CrystallineCradleBlockEntity(pos, state);
     }
+
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level pLevel, BlockState pState, BlockEntityType<T> pBlockEntityType) {

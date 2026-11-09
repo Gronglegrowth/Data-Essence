@@ -7,6 +7,9 @@ import EsetKalenko.Halcyon.api.util.DissipationUtil;
 import EsetKalenko.Halcyon.registry.BlockEntityRegistry;
 import EsetKalenko.Halcyon.registry.EssenceTypeRegistry;
 import EsetKalenko.Halcyon.registry.HalcyonTags;
+import com.cmdpro.databank.model.animation.DatabankAnimationReference;
+import com.cmdpro.databank.model.animation.DatabankAnimationState;
+import net.minecraft.client.animation.AnimationDefinition;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -23,6 +26,16 @@ import org.jetbrains.annotations.NotNull;
 
 public class CrystallineCradleBlockEntity extends BlockEntity implements EssenceBlockEntity {
     public SingleEssenceContainer storage = new SingleEssenceContainer(EssenceTypeRegistry.ESSENCE.get(), 2000);
+    public DatabankAnimationState animState = new DatabankAnimationState("idle")
+            .addAnim(new DatabankAnimationReference("idle",
+                    (state, anim) -> {},
+                    (state, anim) -> {}
+            ))
+            .addAnim(new DatabankAnimationReference("hit_bell",
+                    (state, anim) -> {},
+                    (state, anim) -> state.setAnim("idle")
+            ));
+    public AnimationDefinition anim;
     private final float breakCost = 25f;
     public int interval;
     public final float destroyRange = 6f;

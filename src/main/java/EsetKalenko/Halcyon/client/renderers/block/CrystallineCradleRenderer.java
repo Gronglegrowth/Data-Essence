@@ -2,6 +2,7 @@ package EsetKalenko.Halcyon.client.renderers.block;
 
 import EsetKalenko.Halcyon.Halcyon;
 import EsetKalenko.Halcyon.block.production.CrystallineCradleBlockEntity;
+import EsetKalenko.Halcyon.registry.EssenceTypeRegistry;
 import com.cmdpro.databank.model.DatabankModel;
 import com.cmdpro.databank.model.DatabankModels;
 import com.cmdpro.databank.model.blockentity.DatabankBlockEntityModel;
@@ -52,7 +53,12 @@ public class CrystallineCradleRenderer extends DatabankBlockEntityRenderer<Cryst
 
         @Override
         public void setupModelPose(CrystallineCradleBlockEntity cradle, float partialTick) {
-            // TODO. animating with "hit_bell" should be done 0.5s before the thing harvests crystals
+            cradle.animState.updateAnimDefinitions(getModel());
+            if ( cradle.interval <= 10
+                    && !cradle.animState.isCurrentAnim("hit_bell")) {
+                cradle.animState.setAnim("hit_bell");
+            }
+            animate(cradle.animState);
         }
 
         @Override

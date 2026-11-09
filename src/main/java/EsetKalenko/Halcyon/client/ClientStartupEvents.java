@@ -189,6 +189,7 @@ public class ClientStartupEvents {
         event.registerItem(AnimatedBlockItemUtil.createBasicExtensions(Halcyon.locate("textures/block/survey_tunneler.png"), Halcyon.locate("survey_tunneler")), BlockRegistry.SURVEY_TUNNELER.get().asItem());
         event.registerItem(AnimatedBlockItemUtil.createBasicExtensions(Halcyon.locate("textures/block/essence_derivation_spike.png"), Halcyon.locate("essence_derivation_spike")), BlockRegistry.ESSENCE_DERIVATION_SPIKE.get().asItem());
         event.registerItem(AnimatedBlockItemUtil.createBasicExtensions(Halcyon.locate("textures/block/rf_node.png"), Halcyon.locate("essence_point")), BlockRegistry.RF_NODE.get().asItem());
+        event.registerItem(AnimatedBlockItemUtil.createBasicExtensions(Halcyon.locate("textures/block/crystalline_cradle.png"), Halcyon.locate("crystalline_cradle")), BlockRegistry.CRYSTALLINE_CRADLE.get().asItem());
     }
 
     @SubscribeEvent
