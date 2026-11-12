@@ -102,7 +102,7 @@ public class DataNEssenceCommands {
                                 .executes(command -> {
                                     return entryeditor(command);
                                 })))
-        );
+        ));
     }
 
     private static int chargeItem(CommandContext<CommandSourceStack> command, ServerPlayer player) {
