@@ -38,7 +38,7 @@ import java.util.Set;
 public class DataNEssenceCommands {
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher){
         dispatcher.register(Commands.literal(Halcyon.MOD_ID)
-                .requires(source -> source.hasPermission(4))
+                .requires(source -> source.hasPermission(2))
                 .then(Commands.literal("entry")
                         .then(Commands.argument("target", EntityArgument.player())
                         // /halcyon entry <id || all> <true/false> [true/false]
@@ -69,6 +69,7 @@ public class DataNEssenceCommands {
                         )
                 )
                 .then(Commands.literal("set_tier")
+                        .then(Commands.argument("target", EntityArgument.player())
                         .then(Commands.argument("tier", IntegerArgumentType.integer(0))
                                 .executes((command) -> {
                                     return settier(command);
@@ -188,7 +189,14 @@ public class DataNEssenceCommands {
 
     private static int settier(CommandContext<CommandSourceStack> command) {
         if(command.getSource().getEntity() instanceof Player) {
-            Player player = (Player) command.getSource().getEntity();
+            Player player;
+
+            try {
+                player = command.getArgument("target", EntitySelector.class).findSinglePlayer(command.getSource());
+            } catch (CommandSyntaxException e) {
+                throw new RuntimeException(e);
+            }
+
             int tier = command.getArgument("tier", int.class);
             DataTabletUtil.setTier(player, tier);
             command.getSource().sendSuccess(() -> {
